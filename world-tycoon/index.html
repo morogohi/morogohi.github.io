@@ -30,7 +30,7 @@ body{min-height:100vh;overflow-x:hidden;background:
  radial-gradient(700px 700px at 100% 100%,rgba(40,70,140,.25),transparent 60%),
  linear-gradient(180deg,#0b1222,#070b16 70%)}
 body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
-#app{position:relative;z-index:1;max-width:580px;margin:0 auto;padding:10px 10px 48px}
+#app{position:relative;z-index:1;max-width:580px;margin:0 auto;padding:calc(10px + var(--sat,0px)) calc(10px + var(--sar,0px)) calc(48px + var(--sab,0px)) calc(10px + var(--sal,0px))}
 .brand{text-align:center;margin:18px 0 6px}
 .brand .en{font-family:Cinzel,serif;font-weight:600;letter-spacing:.42em;font-size:11px;color:var(--gold);opacity:.9}
 .brand h1{font-family:'Noto Serif KR',serif;font-weight:900;font-size:34px;margin:6px 0 4px;letter-spacing:-.02em;
@@ -281,7 +281,7 @@ const won=n=>(n<0?'-':'')+Math.abs(n).toLocaleString()+'만';
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r6=()=>1+Math.floor(Math.random()*6);
 const rid=(n=8)=>Array.from({length:n},()=>'abcdefghijkmnpqrstuvwxyz23456789'[Math.floor(Math.random()*32)]).join('');
-const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}try{window.__aitSet&&window.__aitSet(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const isPort=i=>T[i].t==='air'&&T[i].n.endsWith('항')&&!T[i].n.endsWith('공항');
 
 /* ================== 공용 규칙(읽기) ================== */
@@ -907,21 +907,21 @@ function renderMenu(){
   ${BRAND()}
   ${heroSVG()}
   <div class="sub">8개 대륙 24개 도시를 사고, 시티 아이콘을 세우고, 경매와 협상으로 여행 제국을 완성하세요</div>
-  <div class="chips"><span>📴 인터넷 없이 플레이</span><span>🤖 AI 대전</span><span>👥 한 기기 최대 6인</span><span>💾 중간 저장</span></div>
+  <div class="chips">${window.AIT_BUILD?'':'<span>📴 인터넷 없이 플레이</span>'}<span>🤖 AI 대전</span><span>👥 한 기기 최대 6인</span><span>💾 중간 저장</span></div>
   <div class="panel"><h3>PLAY</h3>
     <button class="btn pri full glow" style="font-size:16px;padding:14px" onclick="quickPlay()">▶ 바로 시작 · AI 2명과 대결</button>
     <div class="row mt"><button class="btn" onclick="go('local')">게임 설정하고 시작</button>${saved?`<button class="btn" onclick="go('resume')">이어하기</button>`:''}</div>
-    ${installUI()}
+    ${window.AIT_BUILD?aitMenuUI():installUI()}
   </div>
   <div class="panel"><h3>CHARACTER</h3>
     <div class="avpick">${AVN.map((n,i)=>`<button class="${i===myAv?'sel':''}" onclick="pickAv(${i})"><span class="av" style="width:100%;aspect-ratio:1">${avatarSVG(i,PCOL[i])}</span><div class="nm">${n}</div></button>`).join('')}</div>
     <input id="nm" class="mt" maxlength="8" placeholder="닉네임 (최대 8자)" value="${esc(myName)}"></div>
-  <div class="panel"><h3>ONLINE</h3>
+  ${window.AIT_BUILD?'':`<div class="panel"><h3>ONLINE</h3>
     ${chk?'<p class="note">네트워크 확인 중…</p>':''}
     ${netState==='off'?'<p class="note">친구와 실시간 온라인 대전은 claude.ai 공유 버전에서 지원됩니다. 이 버전은 인터넷 없이도 AI 대전·한 기기 대전을 모두 즐길 수 있어요.</p>':''}
     <button class="btn pri full ${net?'glow':''}" ${net?'':'disabled'} onclick="go('host')">방 만들기 · 호스트</button>
     <div class="row mt"><input id="cd" maxlength="4" placeholder="방 코드" style="text-transform:uppercase;letter-spacing:6px;text-align:center;font-family:Cinzel,serif"><button class="btn" style="flex:0 0 96px" ${net?'':'disabled'} onclick="go('join')">참가</button></div>
-  </div>
+  </div>`}
   <div class="panel"><h3>SAVED GAMES</h3>
     ${saveList().length?`<div class="plist2">${saveList().map((r,k)=>`<div class="prow"><span class="sw" style="background:var(--gold)"></span><div class="t">${esc(r.at)} · ROUND ${r.S.rd}${r.S.lim?'/'+r.S.lim:''}<small>${r.S.pl.map(p=>esc(p.n)).join(', ')} · ${r.code?'온라인 방 '+esc(r.code):'로컬'}</small></div><button class="btn sm pri" onclick="loadSlot(${k})">불러오기</button><button class="btn sm" onclick="delSlot(${k})">✕</button></div>`).join('')}</div>`:'<p class="note" style="margin-top:0">게임 중 상단 💾 버튼으로 중간 저장할 수 있어요.</p>'}
     <div class="row mt"><input id="scode" placeholder="저장 코드 붙여넣기 (WT1.…)" style="font-size:13px"><button class="btn" style="flex:0 0 96px" onclick="loadCode()">불러오기</button></div>
@@ -955,10 +955,21 @@ function installUI(){
   return '';
 }
 window.doInstall=async function(){if(!deferredInstall)return;SFX.click();deferredInstall.prompt();try{await deferredInstall.userChoice}catch(e){}deferredInstall=null;render()};
-window.quickPlay=function(){SFX.click();createRoom(false);hostAct(-1,'addbot',0,true);hostAct(-1,'addbot',0,true);hostAct(-1,'start',0,true)};
+window.quickPlay=function(bonus){SFX.click();createRoom(false);hostAct(-1,'addbot',0,true);hostAct(-1,'addbot',0,true);
+  if(bonus&&S&&S.pl[0]){S.pl[0].m+=300}
+  hostAct(-1,'start',0,true);if(bonus){log('📺 광고 보상: 시작 자금 +300만');commit()}
+  try{window.AIT&&AIT.log('game_start',{mode:'quick',bonus:!!bonus})}catch(e){}};
+function aitMenuUI(){const A=window.AIT;if(!A||!A.inToss)return '';let h='';
+  if(A.hasReward)h+=`<button class="btn full mt" ${A.rewardReady?'':'disabled'} onclick="rewardStart()">📺 광고 보고 시작 자금 +300만으로 시작${A.rewardReady?'':' (준비 중…)'}</button>`;
+  if(A.leaderboard)h+=`<button class="btn full mt" onclick="AIT.openLeaderboard()">🏆 토스 랭킹 보기</button>`;
+  return h}
+window.rewardStart=async function(){SFX.click();if(!window.AIT)return;try{AU.mg&&AU.mg.gain.setTargetAtTime(0,AU.ctx.currentTime,.05)}catch(e){}
+  const ok=await AIT.showReward();try{AU.setMusic(AU.music)}catch(e){}
+  if(ok)quickPlay(true);else toast('광고를 끝까지 시청하면 보너스를 받을 수 있어요')};
+window.__aitReady=function(){if(mode==='menu')render()};
 /* ---- 서비스 워커 (GitHub Pages 등 일반 웹 호스팅에서만) ---- */
 let swOK=false;
-try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&/github\.io$|localhost$/.test(location.hostname)){
+try{if(!window.AIT_BUILD&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&/github\.io$|localhost$/.test(location.hostname)){
   navigator.serviceWorker.register('sw.js').then(()=>{swOK=true;if(mode==='menu')render()}).catch(()=>{})}}catch(e){}
 window.pickAv=function(i){myAv=i;LS.set('wt_av',String(i));SFX.click();const v=document.getElementById('nm').value;render();document.getElementById('nm').value=v};
 window.go=function(k){
@@ -1027,7 +1038,7 @@ function renderGame(){
   const D=pend?'disabled':'';
   let prompt='',acts='',sub='';
   const tr=S.tr;
-  if(S.ph==='over'){const w=S.pl[S.w];prompt=`<div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:900;color:var(--gold2)">🏆 ${w?esc(w.n):'-'} 우승</div>`;acts=isHost?`<button class="btn pri glow" onclick="uiAct('newgame')">새 게임</button>`:''}
+  if(S.ph==='over'){const w=S.pl[S.w];prompt=`<div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:900;color:var(--gold2)">🏆 ${w?esc(w.n):'-'} 우승</div>`;acts=(isHost?`<button class="btn pri glow" onclick="uiAct('newgame')">새 게임</button>`:'')+(window.AIT&&AIT.leaderboard?`<button class="btn" onclick="AIT.openLeaderboard()">🏆 랭킹</button>`:'')}
   else if(S.ph==='auction'){prompt=auBox()}
   else if(!mine){prompt=cur.k==='b'?'AI가 생각 중…':`<b>${esc(cur.n)}</b>님의 차례`}
   else if(S.ph==='roll'){prompt=cur.j?`입국 심사 대기 (${cur.j-1}/2) — 더블이면 통과`:(S.again?'더블! 한 번 더 굴리세요':'주사위를 굴리세요');
@@ -1098,7 +1109,7 @@ function diffState(a,b){
   const q=[];const me=b.pl.findIndex(p=>p.cid===myCid);
   const lastLog=b.lg.slice(-3).join(' ');
   const traded=/거래 성사/.test(lastLog)&&a.tr&&!b.tr;
-  if(b.rc!==a.rc){SFX.dice();diceUntil=Date.now()+700}
+  if(b.rc!==a.rc){SFX.dice();diceUntil=Date.now()+700;try{window.AIT&&AIT.haptic('tickMedium')}catch(e){}}
   for(let i=0;i<N;i++){
     if(a.o[i]!==b.o[i]&&ownOf(b,i)>=0&&!traded)q.push(()=>{SFX.coin();popTile(i);sparkTile(i)});
     if(traded&&a.o[i]!==b.o[i])q.push(()=>popTile(i));
@@ -1121,7 +1132,8 @@ function diffState(a,b){
   if(traded)q.push(()=>{SFX.deal();confetti(700);toast('🤝 거래 성사!')});
   else if(a.tr&&!b.tr&&/거절|취소/.test(lastLog))q.push(()=>SFX.nope());
   if((b.t!==a.t||b.tn!==a.tn)&&b.ph==='roll')q.push(()=>banner(b.pl[b.t],iControl(b)));
-  if(b.ph==='over'&&a.ph!=='over')q.push(()=>{SFX.win();confetti(3500)});
+  if(b.ph==='over'&&a.ph!=='over')q.push(()=>{SFX.win();confetti(3500);
+    try{const A=window.AIT;if(A&&A.inToss){const mi=b.pl.findIndex(p=>p.cid===myCid);if(mi>=0)A.submitScore(worth(b,mi));A.haptic('confetti');A.log('game_over',{win:mi===b.w,rounds:b.rd});setTimeout(()=>A.showInterstitial(),2200)}}catch(e){}});
   afterQ.push(...q);
 }
 function popTile(i){const e=document.getElementById('tl'+i);if(e){e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}}
