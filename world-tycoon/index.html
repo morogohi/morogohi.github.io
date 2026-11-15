@@ -77,9 +77,9 @@ input:focus{border-color:var(--gold)}
 .ico.off{opacity:.4}
 .ico.off svg{opacity:.6}
 /* board */
-.board{width:min(100%,560px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:2px;padding:5px;border-radius:16px;position:relative;
+.board{width:min(100%,560px);aspect-ratio:1;margin:0 auto;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:2px;padding:5px;border-radius:16px;position:relative;
   background:linear-gradient(145deg,#0f1a30,#0a1222);border:1px solid #6b5426;box-shadow:0 0 0 3px #0a0f1c,0 0 0 4px #b8893a,0 24px 50px rgba(0,0,0,.7)}
-.tile{background:linear-gradient(180deg,#fbf7ec,#ece3cc);color:#1b2233;border-radius:3px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-size:clamp(6.5px,1.8vw,9.5px);line-height:1.05;text-align:center;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(120,90,30,.18)}
+.tile{background:linear-gradient(180deg,#fbf7ec,#ece3cc);color:#1b2233;border-radius:3px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-size:clamp(7px,2vw,10.5px);line-height:1.05;text-align:center;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(120,90,30,.18)}
 .tile .bar{width:100%;height:19%;flex:0 0 auto;background-image:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0) 55%,rgba(0,0,0,.18))!important}
 .tile .ic{font-size:clamp(8px,2.4vw,13px);line-height:1.15;margin-top:2px}
 .tile .si{width:46%;margin-top:9%;line-height:0}
@@ -91,6 +91,8 @@ input:focus{border-color:var(--gold)}
 .tile.dark{background:linear-gradient(160deg,#172340,#0d1529);color:var(--gold2);box-shadow:inset 0 0 0 1px rgba(217,180,90,.35)}
 .tile.corner .si{width:56%;margin-top:14%}
 .tile.corner .nm{font-size:1.02em}
+.tile .bar{position:relative}
+.tile .sun{position:absolute;right:1px;top:-1px;font-size:.95em;color:#fff3b0;text-shadow:0 0 4px #f59e0b,0 0 2px #000;animation:wig 2s ease-in-out infinite}
 .tile .own{position:absolute;left:0;right:0;bottom:0;height:10%;box-shadow:0 -1px 0 rgba(255,255,255,.5)}
 .tile.mg{filter:grayscale(.85) brightness(.85)}
 .tile .stamp{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%) rotate(-18deg);border:1.5px solid #c0392b;color:#c0392b;font-weight:900;font-size:.95em;padding:0 2px;border-radius:3px;background:#fff8;letter-spacing:-.5px}
@@ -100,7 +102,7 @@ input:focus{border-color:var(--gold)}
 .tile.lm{background:linear-gradient(180deg,#fffaf0,#f1dfae)}
 .tile.au{animation:aupulse 1s ease-in-out infinite}
 @keyframes aupulse{50%{box-shadow:inset 0 0 0 2px #e06464,0 0 14px #e06464}}
-.center{grid-area:2/2/11/11;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:7px;gap:4px;overflow:hidden;color:#fff;position:relative;
+.center{grid-area:2/2/10/10;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:7px;gap:4px;overflow:hidden;color:#fff;position:relative;
   background:radial-gradient(circle at 50% 38%,#17634f 0,#0d4334 48%,#082a22 100%);box-shadow:inset 0 0 0 1px rgba(217,180,90,.5),inset 0 0 0 5px rgba(0,0,0,.25),inset 0 0 0 6px rgba(217,180,90,.25),inset 0 0 40px rgba(0,0,0,.6)}
 .center>*{position:relative;z-index:1}
 .center .globe{position:absolute;inset:8%;z-index:0;opacity:.16;animation:spin 120s linear infinite}
@@ -225,62 +227,62 @@ tr.hl td{color:var(--gold2)}
 <canvas id="fx"></canvas>
 <script>
 'use strict';
-/* ================== 데이터 ================== */
-const GC=['#9b6a4a','#5cc6ee','#e2579f','#f39233','#e43b3b','#eab308','#16a34a','#2f5bd3'];
-const HC=[50,50,100,100,150,150,200,200];
+/* ================== 데이터 (세계일주 부동산왕 고유 규칙 · 36칸 대륙 보드) ================== */
+const N=36,SALARY=180,START_CASH=2000,BAIL=60,HOLD=9,DUTYFREE=18;
+// 대륙별 팔레트 (8개 지역)
+const GC=['#14a3a3','#d6455d','#d39a2c','#e07a3f','#6c5ce7','#2e9d5b','#2f80d1','#b8893a'];
+const GN=['동남아시아','동아시아','중동·아프리카','남유럽','유라시아','아메리카','인도양·오세아니아','프레스티지'];
+const HC=[50,60,90,100,120,140,160,200];
 const MULT=[1,4,12,30,40,50];
+const LV=['미개발','부티크 숍','오피스','레지던스','리조트','시티 아이콘'];
 const PCOL=['#ef4444','#3b82f6','#22c55e','#f59e0b','#a855f7','#14b8a6'];
-const PICO=['🚗','✈️','🚢','🚀','🎈','🚲'];
 const BOTN=['로봇K','알파봇','베타봇','감마봇','델타봇','오메가'];
 const T=[
-{t:'go',n:'출발',s:'출발',i:'🏁'},
-{t:'city',n:'타이베이',s:'타이베이',i:'🇹🇼',g:0,p:60},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'마닐라',s:'마닐라',i:'🇵🇭',g:0,p:60},
-{t:'tax',n:'소득세',s:'소득세',i:'💰',a:200},
-{t:'air',n:'김포공항',s:'김포',i:'🛫',p:200},
-{t:'city',n:'베이징',s:'베이징',i:'🇨🇳',g:1,p:100},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'방콕',s:'방콕',i:'🇹🇭',g:1,p:100},
-{t:'city',n:'하노이',s:'하노이',i:'🇻🇳',g:1,p:120},
-{t:'jail',n:'무인도',s:'무인도',i:'🏝️'},
-{t:'city',n:'카이로',s:'카이로',i:'🇪🇬',g:2,p:140},
-{t:'util',n:'전력공사',s:'전력',i:'⚡',p:150},
-{t:'city',n:'이스탄불',s:'이스탄불',i:'🇹🇷',g:2,p:140},
-{t:'city',n:'아테네',s:'아테네',i:'🇬🇷',g:2,p:160},
-{t:'air',n:'인천공항',s:'인천',i:'🛫',p:200},
-{t:'city',n:'모스크바',s:'모스크바',i:'🇷🇺',g:3,p:180},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'베를린',s:'베를린',i:'🇩🇪',g:3,p:180},
-{t:'city',n:'로마',s:'로마',i:'🇮🇹',g:3,p:200},
-{t:'free',n:'세계여행 휴게소',s:'휴게소',i:'🛋️'},
-{t:'city',n:'마드리드',s:'마드리드',i:'🇪🇸',g:4,p:220},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'파리',s:'파리',i:'🇫🇷',g:4,p:220},
-{t:'city',n:'런던',s:'런던',i:'🇬🇧',g:4,p:240},
-{t:'air',n:'JFK공항',s:'JFK',i:'🛫',p:200},
-{t:'city',n:'시드니',s:'시드니',i:'🇦🇺',g:5,p:260},
-{t:'city',n:'토론토',s:'토론토',i:'🇨🇦',g:5,p:260},
-{t:'util',n:'수자원공사',s:'수도',i:'💧',p:150},
-{t:'city',n:'상파울루',s:'상파울루',i:'🇧🇷',g:5,p:280},
-{t:'gojail',n:'출국금지',s:'출국금지',i:'🚫'},
-{t:'city',n:'도쿄',s:'도쿄',i:'🇯🇵',g:6,p:300},
-{t:'city',n:'싱가포르',s:'싱가포르',i:'🇸🇬',g:6,p:300},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'두바이',s:'두바이',i:'🇦🇪',g:6,p:320},
-{t:'air',n:'창이공항',s:'창이',i:'🛫',p:200},
-{t:'chance',n:'황금찬스',s:'찬스',i:'🎁'},
-{t:'city',n:'뉴욕',s:'뉴욕',i:'🇺🇸',g:7,p:350},
-{t:'tax',n:'사치세',s:'사치세',i:'💎',a:100},
-{t:'city',n:'서울',s:'서울',i:'🇰🇷',g:7,p:400},
+{t:'go',n:'월드 게이트',s:'출발',i:''},
+{t:'city',n:'하노이',s:'하노이',i:'',g:0,p:60},
+{t:'city',n:'마닐라',s:'마닐라',i:'',g:0,p:70},
+{t:'chance',n:'여권 스탬프',s:'스탬프',i:''},
+{t:'city',n:'방콕',s:'방콕',i:'',g:0,p:90},
+{t:'air',n:'인천공항',s:'인천',i:'',p:200},
+{t:'city',n:'타이베이',s:'타이베이',i:'',g:1,p:110},
+{t:'city',n:'베이징',s:'베이징',i:'',g:1,p:120},
+{t:'city',n:'도쿄',s:'도쿄',i:'',g:1,p:140},
+{t:'jail',n:'입국 심사대',s:'입국심사',i:''},
+{t:'city',n:'카이로',s:'카이로',i:'',g:2,p:150},
+{t:'city',n:'이스탄불',s:'이스탄불',i:'',g:2,p:160},
+{t:'fx',n:'환전소',s:'환전소',i:''},
+{t:'city',n:'두바이',s:'두바이',i:'',g:2,p:180},
+{t:'air',n:'피레우스항',s:'피레우스',i:'',p:200},
+{t:'city',n:'아테네',s:'아테네',i:'',g:3,p:190},
+{t:'city',n:'로마',s:'로마',i:'',g:3,p:200},
+{t:'city',n:'마드리드',s:'마드리드',i:'',g:3,p:220},
+{t:'free',n:'면세점',s:'면세점',i:''},
+{t:'city',n:'모스크바',s:'모스크바',i:'',g:4,p:230},
+{t:'city',n:'베를린',s:'베를린',i:'',g:4,p:240},
+{t:'chance',n:'여권 스탬프',s:'스탬프',i:''},
+{t:'city',n:'파리',s:'파리',i:'',g:4,p:260},
+{t:'air',n:'로테르담항',s:'로테르담',i:'',p:200},
+{t:'city',n:'멕시코시티',s:'멕시코',i:'',g:5,p:270},
+{t:'city',n:'상파울루',s:'상파울루',i:'',g:5,p:280},
+{t:'city',n:'토론토',s:'토론토',i:'',g:5,p:300},
+{t:'gojail',n:'비자 만료',s:'비자만료',i:''},
+{t:'city',n:'뭄바이',s:'뭄바이',i:'',g:6,p:310},
+{t:'city',n:'싱가포르',s:'싱가포르',i:'',g:6,p:320},
+{t:'city',n:'시드니',s:'시드니',i:'',g:6,p:340},
+{t:'air',n:'JFK공항',s:'JFK',i:'',p:200},
+{t:'tax',n:'관광세',s:'관광세',i:'',a:120},
+{t:'city',n:'런던',s:'런던',i:'',g:7,p:360},
+{t:'city',n:'뉴욕',s:'뉴욕',i:'',g:7,p:380},
+{t:'city',n:'서울',s:'서울',i:'',g:7,p:400},
 ];
-const BUYABLE=new Set(['city','air','util']);
-const rb=p=>Math.max(2,Math.round(p/8)-3);
+const BUYABLE=new Set(['city','air']);
+const rb=p=>Math.max(3,Math.round(p/8)-2);
 const won=n=>(n<0?'-':'')+Math.abs(n).toLocaleString()+'만';
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r6=()=>1+Math.floor(Math.random()*6);
 const rid=(n=8)=>Array.from({length:n},()=>'abcdefghijkmnpqrstuvwxyz23456789'[Math.floor(Math.random()*32)]).join('');
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const isPort=i=>T[i].t==='air'&&T[i].n.endsWith('항')&&!T[i].n.endsWith('공항');
 
 /* ================== 공용 규칙(읽기) ================== */
 const ownOf=(st,i)=>st.o[i]==='-'?-1:parseInt(st.o[i],36);
@@ -292,12 +294,13 @@ function groupBare(st,i){const t=T[i];return t.t!=='city'||T.every((x,j)=>x.g!==
 function tradable(st,pi,i){return BUYABLE.has(T[i].t)&&ownOf(st,i)===pi&&groupBare(st,i)}
 function canMort(st,pi,i){return !['lobby','over'].includes(st.ph)&&tradable(st,pi,i)&&!isMg(st,i)}
 function canUnmort(st,pi,i){return !['lobby','over'].includes(st.ph)&&ownOf(st,i)===pi&&isMg(st,i)&&st.pl[pi].m>=unmCost(i)}
-function loanOf(st,pi){let s=0;for(let i=0;i<40;i++)if(ownOf(st,i)===pi&&isMg(st,i))s+=T[i].p/2;return s}
+function loanOf(st,pi){let s=0;for(let i=0;i<N;i++)if(ownOf(st,i)===pi&&isMg(st,i))s+=T[i].p/2;return s}
+const r10=v=>Math.round(v/10)*10;
 function rentOf(st,i,dice){
   const t=T[i],o=ownOf(st,i);if(o<0||isMg(st,i))return 0;
-  if(t.t==='city'){const h=hOf(st,i);const b=rb(t.p);return h===0?b*(fullGroup(st,o,t.g)?2:1):b*MULT[h]}
-  if(t.t==='air'){const c=T.filter((x,j)=>x.t==='air'&&ownOf(st,j)===o).length;return 25*Math.pow(2,c-1)}
-  if(t.t==='util'){const c=T.filter((x,j)=>x.t==='util'&&ownOf(st,j)===o).length;return dice*(c===2?10:4)}
+  if(t.t==='city'){const h=hOf(st,i);const b=rb(t.p);let r=h===0?b*(fullGroup(st,o,t.g)?2:1):b*MULT[h];
+    if(st.hs===t.g)r=Math.max(r+5,r10(r*1.5));return r}
+  if(t.t==='air'){const c=T.filter((x,j)=>x.t==='air'&&ownOf(st,j)===o).length;return 30*Math.pow(2,c-1)}
   return 0;
 }
 function canBuild(st,pi,i){const t=T[i];if(!t||t.t!=='city'||st.t!==pi||!['roll','end'].includes(st.ph))return false;
@@ -307,72 +310,78 @@ function worth(st,pi){let w=st.pl[pi].m;T.forEach((t,i)=>{if(ownOf(st,i)===pi){w
 
 /* ================== 호스트(권한) 로직 ================== */
 let S=null;              // 현재 표시 상태 (호스트면 권위 상태)
-function newState(){return {ph:'lobby',t:0,d:[1,1],rc:0,dbl:0,again:false,pl:[],o:'-'.repeat(40),h:'0'.repeat(40),lg:[],pend:-1,cc:'',w:-1,sq:0,tn:0,rd:1,lim:30,mg:'0'.repeat(40),au:null,tr:null}}
+function newState(){return {v:2,ph:'lobby',t:0,d:[1,1],rc:0,dbl:0,again:false,pl:[],o:'-'.repeat(N),h:'0'.repeat(N),lg:[],pend:-1,cc:'',w:-1,sq:0,tn:0,rd:1,lim:30,mg:'0'.repeat(N),au:null,tr:null,hs:-1,pot:0}}
 const setO=(i,v)=>{S.o=S.o.slice(0,i)+(v<0?'-':v.toString(36))+S.o.slice(i+1)};
 const setH=(i,v)=>{S.h=S.h.slice(0,i)+v+S.h.slice(i+1)};
-const setMg=(i,v)=>{if(!S.mg)S.mg='0'.repeat(40);S.mg=S.mg.slice(0,i)+(v?'1':'0')+S.mg.slice(i+1)};
+const setMg=(i,v)=>{if(!S.mg)S.mg='0'.repeat(N);S.mg=S.mg.slice(0,i)+(v?'1':'0')+S.mg.slice(i+1)};
 function log(s){S.lg.push(s);while(S.lg.length>8)S.lg.shift()}
 function freeAv(pref){const used=new Set(S.pl.map(p=>p.a));if(pref>=0&&pref<6&&!used.has(pref))return pref;for(let i=0;i<6;i++)if(!used.has(i))return i;return pref>=0&&pref<6?pref:0}
-function addPlayer(n,cid,k,av){const i=S.pl.length;S.pl.push({n:String(n).slice(0,8),c:i,a:freeAv(av),m:1500,p:0,j:0,b:0,cid,k,on:1})}
+function addPlayer(n,cid,k,av){const i=S.pl.length;S.pl.push({n:String(n).slice(0,8),c:i,a:freeAv(av),m:START_CASH,p:0,j:0,b:0,cid,k,on:1})}
 function recolor(){S.pl.forEach((p,i)=>p.c=i)}
 
-function pay(pi,amt,to){const p=S.pl[pi];if(amt<=0)return;p.m-=amt;if(to>=0)S.pl[to].m+=amt;settle(pi,to)}
+// to: 플레이어 번호 / -1 은행 / -2 면세점 적립금
+function pay(pi,amt,to){const p=S.pl[pi];if(amt<=0)return;p.m-=amt;if(to>=0)S.pl[to].m+=amt;else if(to===-2)S.pot=(S.pot||0)+amt;settle(pi,to)}
 function gain(pi,amt){S.pl[pi].m+=amt}
 function settle(pi,to){
   const p=S.pl[pi];if(p.m>=0)return;
   let sold=false;
-  while(p.m<0){let best=-1;for(let i=0;i<40;i++)if(ownOf(S,i)===pi&&hOf(S,i)>0&&(best<0||HC[T[i].g]>HC[T[best].g]))best=i;
+  while(p.m<0){let best=-1;for(let i=0;i<N;i++)if(ownOf(S,i)===pi&&hOf(S,i)>0&&(best<0||HC[T[i].g]>HC[T[best].g]))best=i;
     if(best<0)break;setH(best,hOf(S,best)-1);p.m+=HC[T[best].g]/2;sold=true}
-  if(sold)log(`🏚️ ${p.n} 건물 긴급 매각`);
-  let mg=false;for(let i=39;i>=0&&p.m<0;i--)if(ownOf(S,i)===pi&&!isMg(S,i)){p.m+=T[i].p/2;setMg(i,1);mg=true}
+  if(sold)log(`🏚️ ${p.n} 개발 시설 긴급 매각`);
+  let mg=false;for(let i=N-1;i>=0&&p.m<0;i--)if(ownOf(S,i)===pi&&!isMg(S,i)){p.m+=T[i].p/2;setMg(i,1);mg=true}
   if(mg)log(`🏦 ${p.n} 부동산 긴급 담보대출`);
   if(p.m<0){
-    if(to>=0)S.pl[to].m+=p.m;
+    if(to>=0)S.pl[to].m+=p.m;else if(to===-2)S.pot=Math.max(0,(S.pot||0)+p.m);
     p.m=0;p.b=1;
-    for(let i=0;i<40;i++)if(ownOf(S,i)===pi){setH(i,0);if(to>=0){setO(i,to)}else{setO(i,-1);setMg(i,0)}}
+    for(let i=0;i<N;i++)if(ownOf(S,i)===pi){setH(i,0);if(to>=0){setO(i,to)}else{setO(i,-1);setMg(i,0)}}
     if(S.tr&&(S.tr.f===pi||S.tr.to===pi))S.tr=null;
     log(`💸 ${p.n} 파산!${to>=0?' 부동산은 '+S.pl[to].n+'에게':''}`);checkWin();
   }
 }
 function checkWin(){const alive=S.pl.map((p,i)=>i).filter(i=>!S.pl[i].b);if(alive.length<=1){S.ph='over';S.w=alive[0]??-1;if(S.w>=0)log(`🏆 ${S.pl[S.w].n} 우승!`)}}
-function goJail(pi){const p=S.pl[pi];p.p=10;p.j=1;S.again=false;S.dbl=0;log(`🏝️ ${p.n} 무인도로!`)}
-function move(pi,n){const p=S.pl[pi];p.p+=n;if(p.p>=40){p.p-=40;p.m+=200;log(`🏁 ${p.n} 출발 통과 +200`)}resolve(pi)}
-function moveTo(pi,dest){const p=S.pl[pi];if(dest<=p.p){p.m+=200;log(`🏁 ${p.n} 출발 통과 +200`)}p.p=dest;resolve(pi)}
+function goJail(pi){const p=S.pl[pi];p.p=HOLD;p.j=1;S.again=false;S.dbl=0;log(`🛂 ${p.n} 입국 심사대로!`)}
+function passGo(p){p.m+=SALARY;log(`🛫 ${p.n} 월드 게이트 통과 +${SALARY}`)}
+function move(pi,n){const p=S.pl[pi];p.p+=n;if(p.p>=N){p.p-=N;passGo(p)}resolve(pi)}
+function moveTo(pi,dest){const p=S.pl[pi];if(dest<=p.p)passGo(p);p.p=dest;resolve(pi)}
+function newSeason(){S.hs=Math.floor(Math.random()*8);log(`☀️ 관광 시즌: ${GN[S.hs]} 통행료 1.5배`)}
 const CARDS=[
- ['출발지로 이동! +200',pi=>moveTo(pi,0)],
- ['서울 여행권! 서울로 이동',pi=>moveTo(pi,39)],
- ['인천공항으로 이동',pi=>moveTo(pi,15)],
- ['길을 잃었다! 뒤로 3칸',pi=>{const p=S.pl[pi];p.p=(p.p+37)%40;resolve(pi)}],
- ['출국금지! 무인도로',pi=>goJail(pi)],
- ['해외 투자 수익 +150',pi=>gain(pi,150)],
- ['복권 당첨 +100',pi=>gain(pi,100)],
- ['여권 분실 벌금 -100',pi=>pay(pi,100,-1)],
- ['과속 벌금 -50',pi=>pay(pi,50,-1)],
- ['생일 축하! 모두에게 30씩 받기',pi=>S.pl.forEach((q,qi)=>{if(qi!==pi&&!q.b)pay(qi,30,pi)})],
- ['건물 수리비: 건물당 25',pi=>{let c=0;for(let i=0;i<40;i++)if(ownOf(S,i)===pi)c+=hOf(S,i);pay(pi,c*25,-1)}],
- ['세계여행! 휴게소로 이동',pi=>moveTo(pi,20)],
- ['관광 홍보대사 상금 +50',pi=>gain(pi,50)],
- ['호텔 숙박비 -80',pi=>pay(pi,80,-1)],
+ ['월드 게이트로 직행! 통과 보너스',pi=>moveTo(pi,0)],
+ ['서울 초청장! 서울로 이동',pi=>moveTo(pi,35)],
+ ['가장 가까운 항구·공항으로 이동',pi=>{const p=S.pl[pi];let d=p.p;for(let k=1;k<=N;k++){const j=(p.p+k)%N;if(T[j].t==='air'){d=j;break}}moveTo(pi,d)}],
+ ['환승 지연! 뒤로 3칸',pi=>{const p=S.pl[pi];p.p=(p.p+N-3)%N;resolve(pi)}],
+ ['비자 서류 누락! 입국 심사대로',pi=>goJail(pi)],
+ ['해외 투자 배당 +150',pi=>gain(pi,150)],
+ ['여행 사진 공모전 우승 +100',pi=>gain(pi,100)],
+ ['수하물 초과 요금 -80 (면세점 적립)',pi=>pay(pi,80,-2)],
+ ['여행자 보험 갱신 -50 (면세점 적립)',pi=>pay(pi,50,-2)],
+ ['여행 기념품 교환! 모두에게 30씩 받기',pi=>S.pl.forEach((q,qi)=>{if(qi!==pi&&!q.b)pay(qi,30,pi)})],
+ ['시설 정기 점검: 개발 단계당 20',pi=>{let c=0;for(let i=0;i<N;i++)if(ownOf(S,i)===pi)c+=hOf(S,i);pay(pi,c*20,-2)}],
+ ['면세점 쇼핑 초대! 면세점으로 이동',pi=>moveTo(pi,DUTYFREE)],
+ ['관광 홍보대사 위촉 +60',pi=>gain(pi,60)],
+ ['관광 시즌 변경!',pi=>newSeason()],
 ];
 function resolve(pi){
   const p=S.pl[pi],i=p.p,t=T[i];
   if(BUYABLE.has(t.t)){const o=ownOf(S,i);
     if(o<0){S.ph='buy';S.pend=i}
     else if(o!==pi&&!S.pl[o].b){const r=rentOf(S,i,S.d[0]+S.d[1]);log(`🧾 ${p.n} → ${S.pl[o].n} 통행료 ${won(r)}`);pay(pi,r,o)}
-  }else if(t.t==='tax'){log(`💰 ${p.n} ${t.n} ${won(t.a)}`);pay(pi,t.a,-1)}
-  else if(t.t==='chance'){const c=CARDS[Math.floor(Math.random()*CARDS.length)];S.cc=c[0];log(`🎁 ${p.n}: ${c[0]}`);c[1](pi)}
+  }else if(t.t==='tax'){log(`🏛️ ${p.n} ${t.n} ${won(t.a)} (면세점 적립)`);pay(pi,t.a,-2)}
+  else if(t.t==='chance'){const c=CARDS[Math.floor(Math.random()*CARDS.length)];S.cc=c[0];log(`🛂 ${p.n}: ${c[0]}`);c[1](pi)}
+  else if(t.t==='fx'){if(Math.random()<.55){const v=r10(50+Math.random()*100);gain(pi,v);log(`💱 ${p.n} 환율 상승! +${won(v)}`)}else{const v=r10(30+Math.random()*70);log(`💱 ${p.n} 환율 하락 -${won(v)}`);pay(pi,v,-2)}}
+  else if(t.t==='free'){const v=S.pot||0;if(v>0){gain(pi,v);S.pot=0;log(`🛍️ ${p.n} 면세점 적립금 ${won(v)} 획득!`)}else log(`🛍️ ${p.n} 면세점 방문 (적립금 없음)`)}
   else if(t.t==='gojail')goJail(pi);
 }
 function doRoll(pi){
   const p=S.pl[pi],d1=r6(),d2=r6(),dbl=d1===d2;S.d=[d1,d2];S.rc++;S.cc='';S.ph='res';
   log(`🎲 ${p.n} ${d1}+${d2}${dbl?' 더블!':''}`);
   if(p.j>0){
-    if(dbl){p.j=0;log(`🎉 ${p.n} 무인도 탈출`);S.again=false;move(pi,d1+d2)}
-    else{p.j++;if(p.j>3){log(`⛓️ ${p.n} 보석금 50 지불 후 출발`);p.j=0;pay(pi,50,-1);S.again=false;if(!p.b)move(pi,d1+d2)}
+    if(dbl){p.j=0;log(`✅ ${p.n} 입국 심사 통과`);S.again=false;move(pi,d1+d2)}
+    else{p.j++;if(p.j>2){log(`🛂 ${p.n} 심사 수수료 ${BAIL} 내고 통과`);p.j=0;pay(pi,BAIL,-2);S.again=false;if(!p.b)move(pi,d1+d2)}
       else{S.ph='end';return}}
   }else{
-    if(dbl){S.dbl++;if(S.dbl>=3){log('더블 3연속!');goJail(pi);S.ph='end';return}}
-    S.again=dbl;move(pi,d1+d2);
+    // 더블은 한 턴에 한 번만 추가 굴림
+    if(dbl){S.dbl++}
+    S.again=dbl&&S.dbl<2;move(pi,d1+d2);
   }
   if(S.ph==='res')S.ph=(S.again&&!p.j)?'roll':'end';
 }
@@ -380,7 +389,7 @@ function nextTurn(){
   S.dbl=0;S.again=false;S.cc='';S.pend=-1;S.tn++;
   const n=S.pl.length;let t=S.t;
   for(let k=1;k<=n;k++){t=(S.t+k)%n;if(!S.pl[t].b)break}
-  if(t<=S.t){S.rd++;if(S.lim&&S.rd>S.lim){endByWorth();return}}
+  if(t<=S.t){S.rd++;if(S.lim&&S.rd>S.lim){endByWorth();return}if((S.rd-1)%3===0)newSeason()}
   S.t=t;S.ph='roll';
 }
 function endByWorth(){let best=-1;S.pl.forEach((p,i)=>{if(!p.b&&(best<0||worth(S,i)>worth(S,best)))best=i});
@@ -423,7 +432,7 @@ setInterval(()=>{
 /* ---- 거래 ---- */
 function cleanTrade(x,pi){
   if(!x||typeof x!=='object')return null;const to=x.to|0;if(!S.pl[to]||to===pi||S.pl[to].b)return null;
-  const arr=v=>Array.isArray(v)?[...new Set(v.map(n=>n|0).filter(n=>n>=0&&n<40))].slice(0,28):[];
+  const arr=v=>Array.isArray(v)?[...new Set(v.map(n=>n|0).filter(n=>n>=0&&n<N))].slice(0,28):[];
   const g=arr(x.g).filter(i=>tradable(S,pi,i)),r=arr(x.r).filter(i=>tradable(S,to,i));
   const gm=Math.max(0,Math.min(S.pl[pi].m,(x.gm|0))),rm=Math.max(0,Math.min(S.pl[to].m,(x.rm|0)));
   if(!g.length&&!r.length)return null;if(!g.length&&!gm)return null;if(!r.length&&!rm)return null;
@@ -451,12 +460,12 @@ function botJudge(){
 function turnAct(pi,t,a){
   const p=S.pl[pi];
   if(t==='roll'){if(S.ph!=='roll')return;doRoll(pi)}
-  else if(t==='payjail'){if(S.ph!=='roll'||!p.j||p.m<50)return;p.m-=50;p.j=0;log(`🔓 ${p.n} 보석금 50 지불`)}
+  else if(t==='payjail'){if(S.ph!=='roll'||!p.j||p.m<BAIL)return;p.m-=BAIL;S.pot=(S.pot||0)+BAIL;p.j=0;log(`🛂 ${p.n} 심사 수수료 ${BAIL} 납부`)}
   else if(t==='buy'){if(S.ph!=='buy')return;const tl=T[S.pend];if(p.m<tl.p)return;p.m-=tl.p;setO(S.pend,pi);log(`🏠 ${p.n} ${tl.n} 구매 (${won(tl.p)})`);S.pend=-1;S.ph=S.again&&!p.j?'roll':'end'}
   else if(t==='skip'){if(S.ph!=='buy')return;startAuction(S.pend)}
 
-  else if(t==='build'){if(!canBuild(S,pi,a))return;const tl=T[a];p.m-=HC[tl.g];setH(a,hOf(S,a)+1);log(`🏗️ ${p.n} ${tl.n}에 ${hOf(S,a)===5?'랜드마크':'건물'} 건설`)}
-  else if(t==='sell'){if(!canSell(S,pi,a))return;const tl=T[a];p.m+=HC[tl.g]/2;setH(a,hOf(S,a)-1);log(`🔨 ${p.n} ${tl.n} 건물 매각`)}
+  else if(t==='build'){if(!canBuild(S,pi,a))return;const tl=T[a];p.m-=HC[tl.g];setH(a,hOf(S,a)+1);log(`🏗️ ${p.n} ${tl.n} ${LV[hOf(S,a)]} 개발`)}
+  else if(t==='sell'){if(!canSell(S,pi,a))return;const tl=T[a];p.m+=HC[tl.g]/2;setH(a,hOf(S,a)-1);log(`🔨 ${p.n} ${tl.n} 개발 시설 매각`)}
   else if(t==='end'){if(S.ph!=='end')return;nextTurn()}
 }
 const HOST_ONLY=new Set(['lim','start','addbot','addlocal','kick','newgame']);
@@ -478,7 +487,7 @@ function hostAct(pi,t,a,fromHost){
     else if(t==='addlocal'&&S.ph==='lobby'&&S.pl.length<6){addPlayer('플레이어'+(S.pl.length+1),'loc-'+rid(),'l')}
     else if(t==='lim'&&S.ph==='lobby'&&[0,20,30,50].includes(a)){S.lim=a}
     else if(t==='kick'&&S.ph==='lobby'&&S.pl[a]&&S.pl[a].k!=='h'){S.pl.splice(a,1);recolor()}
-    else if(t==='start'&&S.ph==='lobby'&&S.pl.length>=2){S.ph='roll';S.t=0;log('🌏 세계일주 시작! 각자 1,500만 지급')}
+    else if(t==='start'&&S.ph==='lobby'&&S.pl.length>=2){S.ph='roll';S.t=0;log(`🌏 세계일주 시작! 각자 ${won(START_CASH)} 지급`);newSeason()}
     else if(t==='newgame'&&S.ph==='over'){const pl=S.pl;S=Object.assign(newState(),{sq:S.sq,lim:S.lim});pl.forEach(p=>addPlayer(p.n,p.cid,p.k,p.a));log('새 게임 대기 중')}
     else return;
   }else if(ANY.has(t)){
@@ -502,7 +511,7 @@ function botStep(){
   botTimer=null;const pi=S.t,p=S.pl[pi];if(!p||p.k!=='b')return;
   if(S.ph==='roll'){if(p.j&&p.m>500)return hostAct(pi,'payjail');return hostAct(pi,'roll')}
   if(S.ph==='buy'){const tl=T[S.pend];return hostAct(pi,p.m-tl.p>=100?'buy':'skip')}
-  if(S.ph==='end'){for(let i=0;i<40;i++)if(canUnmort(S,pi,i)&&p.m-unmCost(i)>=400)return hostAct(pi,'unmort',i);for(let i=39;i>=0;i--)if(canBuild(S,pi,i)&&p.m-HC[T[i].g]>=200)return hostAct(pi,'build',i);return hostAct(pi,'end')}
+  if(S.ph==='end'){for(let i=0;i<N;i++)if(canUnmort(S,pi,i)&&p.m-unmCost(i)>=400)return hostAct(pi,'unmort',i);for(let i=N-1;i>=0;i--)if(canBuild(S,pi,i)&&p.m-HC[T[i].g]>=200)return hostAct(pi,'build',i);return hostAct(pi,'end')}
 }
 
 /* ================== 네트워크 ================== */
@@ -524,7 +533,7 @@ function commit(){
     R.presence({role:'host',code,st:S}).catch(()=>{})}
   persist();render();scheduleBot();
 }
-function saveList(){try{return JSON.parse(LS.get('wt_saves')||'[]')}catch(e){return []}}
+function saveList(){try{return JSON.parse(LS.get('wt_saves')||'[]').filter(x=>x&&x.S&&x.S.o&&x.S.o.length===N)}catch(e){return []}}
 function saveGame(){
   if(!isHost||!S)return null;
   const rec={id:Date.now(),at:new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),code,net:!!R,S:JSON.parse(JSON.stringify(S)),lastSeq};
@@ -534,8 +543,9 @@ function saveCode(rec){try{return 'WT1.'+btoa(unescape(encodeURIComponent(JSON.s
 function parseSaveCode(c){try{c=String(c).trim();if(!c.startsWith('WT1.'))return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!o||!o.S||!Array.isArray(o.S.pl)||typeof o.S.o!=='string')return null;return o}catch(e){return null}}
 async function createRoom(net,resume){
   isHost=true;mode='game';
+  if(resume&&(!resume.S||!resume.S.o||resume.S.o.length!==N)){isHost=false;mode='menu';try{toast('이전 버전(40칸 보드) 저장은 새 보드와 호환되지 않습니다')}catch(e){}render();return}
   if(resume){S=JSON.parse(JSON.stringify(resume.S));code=resume.code||'';lastSeq=resume.lastSeq||{};net=!!resume.net&&!!code;
-    S.mg=S.mg||'0'.repeat(40);if(S.au===undefined)S.au=null;if(S.tr===undefined)S.tr=null;
+    S.mg=S.mg||'0'.repeat(N);if(S.pot==null)S.pot=0;if(S.hs==null)S.hs=-1;if(S.au===undefined)S.au=null;if(S.tr===undefined)S.tr=null;
     if(S.ph==='auction'&&S.au)S.au.end=Date.now()+8000;
     if(!S.pl.some(p=>p.cid===myCid)){const h=S.pl.find(p=>p.k==='h');if(h)h.cid=myCid}
     disp=[];prevSnap=null;lastSqSeen=-1}
@@ -715,22 +725,25 @@ function av(p,size){return `<span class="av" style="width:${size}px;height:${siz
 
 /* ================== 부동산 그래픽 ================== */
 const LM=[
- 'M30 100V82h40v18z M20 82l10-8h40l10 8z M35 74V60h30v14z M25 60l10-8h30l10 8z M40 52V40h20v12z M30 40l10-8h20l10 8z M47 32V16h6v16z M44 16l6-10 6 10z',
- 'M14 100h72v-9H14z M24 91c0-30 52-30 52 0z M42 66h16v-8H42z M46 58l4-46 4 46z M20 91v-8h6v8zM74 91v-8h6v8z',
- 'M8 100L46 34 84 100z M58 100L76 70 96 100z M46 34L66 100H52z',
- 'M36 100V58h28v42z M28 58c0-15 22-19 22-38 0 19 22 23 22 38z M49 20V6h2v14z M14 100V70h12v30z M14 70c0-8 6-10 6-18 0 8 6 10 6 18z M74 100V70h12v30z M74 70c0-8 6-10 6-18 0 8 6 10 6 18z',
- 'M18 100L44 22h12l26 78H68l-6-18H38l-6 18z M40 76h20l-4-14H44z M45 22l5-18 5 18z M30 62h40v-5H30z M38 42h24v-4H38z',
- 'M6 100h88v-8H6z M12 92c6-34 22-46 34-48-6 18-6 34-3 48z M36 92c6-40 24-52 38-54-7 20-7 38-4 54z M62 92c4-24 14-32 24-34-4 12-4 24-2 34z',
- 'M40 100V28l10-12 10 12v72z M49 16V0h2v16z M22 100V54h13v46z M65 100V42h13v58z M44 34h12M44 44h12M44 54h12M44 64h12M44 74h12M44 84h12',
- 'M45 100l3-58h4l3 58z M34 42h32l-4-8H38z M38 34h24v-10H38z M42 24h16l-3-6H45z M49 18V2h2v16z M30 100l12-30M70 100L58 70',
+'M14 100h72v-9H14z M24 91c0-30 52-30 52 0z M42 66h16v-8H42z M46 58l4-46 4 46z M20 91v-8h6v8zM74 91v-8h6v8z',
+'M30 100V82h40v18z M20 82l10-8h40l10 8z M35 74V60h30v14z M25 60l10-8h30l10 8z M40 52V40h20v12z M30 40l10-8h20l10 8z M47 32V16h6v16z M44 16l6-10 6 10z',
+'M8 100L46 34 84 100z M58 100L76 70 96 100z M46 34L66 100H52z',
+'M18 100L44 22h12l26 78H68l-6-18H38l-6 18z M40 76h20l-4-14H44z M45 22l5-18 5 18z M30 62h40v-5H30z M38 42h24v-4H38z',
+'M36 100V58h28v42z M28 58c0-15 22-19 22-38 0 19 22 23 22 38z M49 20V6h2v14z M14 100V70h12v30z M14 70c0-8 6-10 6-18 0 8 6 10 6 18z M74 100V70h12v30z M74 70c0-8 6-10 6-18 0 8 6 10 6 18z',
+'M40 100V28l10-12 10 12v72z M49 16V0h2v16z M22 100V54h13v46z M65 100V42h13v58z M44 34h12M44 44h12M44 54h12M44 64h12M44 74h12M44 84h12',
+'M6 100h88v-8H6z M12 92c6-34 22-46 34-48-6 18-6 34-3 48z M36 92c6-40 24-52 38-54-7 20-7 38-4 54z M62 92c4-24 14-32 24-34-4 12-4 24-2 34z',
+'M45 100l3-58h4l3 58z M34 42h32l-4-8H38z M38 34h24v-10H38z M42 24h16l-3-6H45z M49 18V2h2v16z M30 100l12-30M70 100L58 70',
 ];
 function houseSVG(x,w,roof,lit){const h=w*1.05;return `<g transform="translate(${x},${40-h})"><rect x="${w*.12}" y="${h*.42}" width="${w*.76}" height="${h*.58}" fill="#fff7ed" stroke="#9a3412" stroke-width="1"/>
   <path d="M0 ${h*.46}L${w/2} 0L${w} ${h*.46}z" fill="${roof}" stroke="#0003" stroke-width="1"/><rect x="${w*.42}" y="${h*.7}" width="${w*.18}" height="${h*.3}" fill="#9a3412"/>
   <rect x="${w*.2}" y="${h*.55}" width="${w*.16}" height="${h*.14}" fill="${lit?'#fde047':'#93c5fd'}"/><rect x="${w*.64}" y="${h*.55}" width="${w*.16}" height="${h*.14}" fill="${lit?'#fde047':'#93c5fd'}"/></g>`}
+function bldSVG(x,w,hg,col,lit){let win='';const rows=Math.max(1,Math.floor((hg-6)/6));for(let r=0;r<rows;r++){const y=6+r*6;win+=`<rect x="${w*.2}" y="${y}" width="${w*.22}" height="3" fill="${lit?'#fde68a':'#9fb7d4'}"/><rect x="${w*.58}" y="${y}" width="${w*.22}" height="3" fill="${lit?'#fde68a':'#9fb7d4'}"/>`}
+  return `<g transform="translate(${x},${40-hg})"><rect width="${w}" height="${hg}" rx="1.5" fill="#f4ecd8" stroke="#6b5426" stroke-width=".8"/><rect width="${w}" height="${Math.max(3.5,hg*.14)}" rx="1.5" fill="${col}"/>${win}</g>`}
+const LVH=[0,16,22,29,36];
 function tileBld(i,h,o){
   const roof=PCOL[S.pl[o]?S.pl[o].c%6:0];
   if(h===5)return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet"><path d="${LM[T[i].g]}" fill="url(#gold)" stroke="#92400e" stroke-width="2"/></svg>`;
-  let s='';const w=24,gap=(100-h*w)/(h+1);for(let k=0;k<h;k++)s+=houseSVG(gap+k*(w+gap),w,roof);
+  let s='';const w=20,gap=(100-h*w)/(h+1);for(let k=0;k<h;k++)s+=bldSVG(gap+k*(w+gap),w,LVH[k+1],roof);
   return `<svg viewBox="0 0 100 40" preserveAspectRatio="xMidYMax meet">${s}</svg>`;
 }
 function skyline(i){
@@ -739,12 +752,14 @@ function skyline(i){
   const clouds=`<g fill="#fff" opacity=".18"><ellipse cx="60" cy="34" rx="22" ry="8"><animate attributeName="cx" values="60;90;60" dur="14s" repeatCount="indefinite"/></ellipse><ellipse cx="250" cy="26" rx="28" ry="9"><animate attributeName="cx" values="250;215;250" dur="18s" repeatCount="indefinite"/></ellipse></g>`;
   if(t.t==='city'){
     if(o<0){art=`<rect x="157" y="98" width="4" height="36" fill="#a87b2c"/><rect x="124" y="74" width="72" height="28" rx="3" fill="#0e1628" stroke="url(#gold)" stroke-width="2"/><text x="160" y="86" font-size="7" text-anchor="middle" font-family="Cinzel,serif" letter-spacing="2" fill="#d9b45a">FOR SALE</text><text x="160" y="97" font-size="10" text-anchor="middle" font-weight="900" fill="#f3dc9a">분양 중</text>`}
-    else if(h===0){art=`<rect x="157" y="96" width="3" height="38" fill="#d9b45a"/><path d="M160 96h30l-6 8 6 8h-30z" fill="${roof}"/><text x="160" y="150" font-size="10" text-anchor="middle" fill="#d9b45a">택지 보유 · 건물 없음</text>`}
-    else if(h<5){const w=54,gap=(320-h*w)/(h+1);for(let k=0;k<h;k++)art+=`<g transform="translate(${gap+k*(w+gap)},74) scale(${w/24})">${houseSVG(0,24,roof,true).replace('translate(0,'+(40-24*1.05)+')','')}</g>`}
+    else if(h===0){art=`<rect x="157" y="96" width="3" height="38" fill="#d9b45a"/><path d="M160 96h30l-6 8 6 8h-30z" fill="${roof}"/><text x="160" y="150" font-size="10" text-anchor="middle" fill="#d9b45a">부지 보유 · 미개발</text>`}
+    else if(h<5){const w=46,gap=(320-h*w)/(h+1);for(let k=0;k<h;k++)art+=`<g transform="translate(${gap+k*(w+gap)},${134-40*2.6}) scale(2.6)">${bldSVG(0,w/2.6,LVH[k+1],roof,true)}</g>`}
     else{art=`<g transform="translate(95,8) scale(1.3)"><path d="${LM[t.g]}" fill="url(#gold)" stroke="#92400e" stroke-width="2"/></g>
-      <g transform="translate(18,92) scale(1.3)">${houseSVG(0,24,roof,true).replace('translate(0,'+(40-24*1.05)+')','')}</g><g transform="translate(266,92) scale(1.3)">${houseSVG(0,24,roof,true).replace('translate(0,'+(40-24*1.05)+')','')}</g>
+      <g transform="translate(20,${134-40*2})"><g transform="scale(2)">${bldSVG(0,16,29,roof,true)}</g></g><g transform="translate(262,${134-40*2})"><g transform="scale(2)">${bldSVG(0,16,36,roof,true)}</g></g>
       <g fill="#fde047">${[30,80,240,290].map((x,k)=>`<path d="M${x} ${20+k%2*14}l2 5 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1z"><animate attributeName="opacity" values="1;.2;1" dur="${1+k*.3}s" repeatCount="indefinite"/></path>`).join('')}</g>`}
-  }else if(t.t==='air'){art=`<rect x="0" y="122" width="320" height="12" fill="#475569"/><path d="M20 128h280" stroke="#fff" stroke-width="2" stroke-dasharray="14 10"/><rect x="40" y="70" width="14" height="52" fill="#e2e8f0"/><rect x="32" y="58" width="30" height="14" rx="3" fill="url(#glass)" stroke="#334155"/>
+  }else if(t.t==='air'&&isPort(i)){art=`<rect y="112" width="320" height="22" fill="#1b4f7a"/><path d="M0 118q20-4 40 0t40 0 40 0 40 0 40 0 40 0 40 0 40 0" stroke="#9fd3f0" stroke-width="1.5" fill="none" opacity=".7"/><rect x="18" y="74" width="10" height="40" fill="#94a3b8"/><path d="M10 74h60v6H10z" fill="#d9b45a"/>
+    <g><animateTransform attributeName="transform" type="translate" values="340 0;-180 0" dur="16s" begin="-7s" repeatCount="indefinite"/><path d="M0 112l12 14h96l14-14z" fill="#f4ecd8" stroke="#334155" stroke-width="1.5"/><rect x="20" y="98" width="70" height="14" rx="2" fill="#fff" stroke="#334155"/><rect x="34" y="86" width="40" height="12" rx="2" fill="#fff" stroke="#334155"/><rect x="60" y="74" width="8" height="12" fill="#d6455d"/>${[26,36,46,56,66,76].map(x=>`<circle cx="${x}" cy="105" r="1.6" fill="#2f80d1"/>`).join('')}</g>`}
+  else if(t.t==='air'){art=`<rect x="0" y="122" width="320" height="12" fill="#475569"/><path d="M20 128h280" stroke="#fff" stroke-width="2" stroke-dasharray="14 10"/><rect x="40" y="70" width="14" height="52" fill="#e2e8f0"/><rect x="32" y="58" width="30" height="14" rx="3" fill="url(#glass)" stroke="#334155"/>
     <g><animateTransform attributeName="transform" type="translate" values="-60 20;360 -40" dur="5s" repeatCount="indefinite"/><path d="M60 60l50-6 18-14h8l-8 14 22-2 8-8h6l-4 10 4 10h-6l-8-8-22-2 8 14h-8l-18-14-50-6z" fill="#fff" stroke="#334155" stroke-width="1.5"/></g>`}
   else if(t.t==='util'){art=t.n.includes('전력')?`<rect x="90" y="70" width="60" height="64" fill="#94a3b8"/><path d="M180 134l10-80h30l10 80z" fill="#cbd5e1"/><g fill="#fff" opacity=".8"><circle cx="205" cy="44" r="12"><animate attributeName="cy" values="44;10" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3s" repeatCount="indefinite"/></circle></g><path d="M112 82l-8 18h10l-6 18 18-24h-10l6-12z" fill="#fde047"/>`
     :`<rect x="146" y="70" width="8" height="64" fill="#64748b"/><rect x="176" y="70" width="8" height="64" fill="#64748b"/><ellipse cx="165" cy="56" rx="38" ry="22" fill="#38bdf8" stroke="#0369a1" stroke-width="3"/><path d="M150 50q15-12 30 0" stroke="#fff" stroke-width="3" fill="none"/>`}
@@ -754,7 +769,7 @@ function skyline(i){
     <radialGradient id="sun${i}" cx=".5" cy=".85" r=".6"><stop offset="0" stop-color="#fff1c2" stop-opacity=".7"/><stop offset="1" stop-color="#fff1c2" stop-opacity="0"/></radialGradient></defs>
     <rect width="320" height="160" fill="url(#sk${i})"/><rect width="320" height="160" fill="url(#sun${i})"/>${starz}${clouds}${city}
     <rect y="134" width="320" height="26" fill="#0d1a16"/><rect y="133" width="320" height="1.5" fill="#d9b45a" opacity=".8"/>${art}
-    ${CITY_FLAG[i]?`<svg x="10" y="140.5" width="21" height="14" viewBox="0 0 30 20" preserveAspectRatio="none">${FLAGS[CITY_FLAG[i]]}</svg>`:''}<text x="308" y="152" text-anchor="end" font-family="Cinzel,serif" font-size="10" letter-spacing="3" fill="#d9b45a">${esc(t.t==='city'?'CITY ESTATE':t.t==='air'?'AIRPORT':'UTILITY')}</text></svg>`;
+    ${CITY_FLAG[i]?`<svg x="10" y="140.5" width="21" height="14" viewBox="0 0 30 20" preserveAspectRatio="none">${FLAGS[CITY_FLAG[i]]}</svg>`:''}<text x="308" y="152" text-anchor="end" font-family="Cinzel,serif" font-size="10" letter-spacing="3" fill="#d9b45a">${esc(t.t==='city'?'CITY ESTATE':t.t==='air'?(isPort(i)?'CRUISE PORT':'AIRPORT'):'TRAVEL')}</text></svg>`;
 }
 const GLOBE=`<svg class="globe" viewBox="0 0 100 100"><g fill="none" stroke="#f3dc9a" stroke-width=".5"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="20" ry="46"/><ellipse cx="50" cy="50" rx="36" ry="46"/><path d="M4 50h92M9 30h82M9 70h82M20 14h60M20 86h60"/></g></svg>`;
 
@@ -780,6 +795,12 @@ const IC={
   air:`<svg viewBox="0 0 24 24"><path d="M12 2c.8 0 1.4.7 1.4 1.5V9l8 4.6v2l-8-2.4V18l2 1.6V21L12 20l-3.4 1v-1.4l2-1.6v-4.8l-8 2.4v-2l8-4.6V3.5C10.6 2.7 11.2 2 12 2z" fill="#1d2a4a"/></svg>`,
   pow:`<svg viewBox="0 0 24 24"><path d="M13.5 2L4 14h6.5l-1 8L19 10h-6.5z" fill="url(#gold)" stroke="#9a6b22" stroke-width=".8"/></svg>`,
   water:`<svg viewBox="0 0 24 24"><path d="M12 2.5s7 7.8 7 12.5a7 7 0 0 1-14 0c0-4.7 7-12.5 7-12.5z" fill="#3b82c4"/><path d="M8.5 15a3.5 3.5 0 0 0 3.5 3.5" stroke="#fff" stroke-width="1.4" fill="none" opacity=".8"/></svg>`,
+  hold:`<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="url(#gold)" stroke-width="1.6"/><circle cx="12" cy="10" r="3.2" fill="none" stroke="url(#gold)" stroke-width="1.4"/><path d="M7.5 17.5c1-2.4 2.6-3.4 4.5-3.4s3.5 1 4.5 3.4" fill="none" stroke="url(#gold)" stroke-width="1.4"/><path d="M2 8h3M2 12h3M19 8h3M19 12h3" stroke="#e06464" stroke-width="1.4"/></svg>`,
+  visa:`<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="url(#gold)" stroke-width="1.6"/><path d="M6 9h7M6 12h5" stroke="url(#gold)" stroke-width="1.4"/><circle cx="16.5" cy="12.5" r="3.5" fill="none" stroke="#e06464" stroke-width="1.6"/><path d="M14 15l5-5" stroke="#e06464" stroke-width="1.6"/></svg>`,
+  shop:`<svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 13H6.2z" fill="url(#gold)" stroke="#9a6b22" stroke-width=".8"/><path d="M9 10V6a3 3 0 0 1 6 0v4" fill="none" stroke="url(#gold)" stroke-width="1.6"/><path d="M9.5 15.5l1.7 1.7 3.4-3.6" stroke="#6b4a12" stroke-width="1.4" fill="none"/></svg>`,
+  stamp:`<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="url(#gold)" stroke-width="1.5"/><circle cx="12" cy="11" r="4.2" fill="none" stroke="url(#gold)" stroke-width="1.3"/><path d="M7.8 11h8.4M12 6.8c-1.6 1.4-1.6 7 0 8.4M12 6.8c1.6 1.4 1.6 7 0 8.4" stroke="url(#gold)" stroke-width=".8" fill="none"/><path d="M9 18h6" stroke="url(#gold)" stroke-width="1.3"/></svg>`,
+  fxc:`<svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="5.5" fill="url(#gold)" stroke="#9a6b22" stroke-width=".8"/><text x="8.5" y="11.6" text-anchor="middle" font-size="7" font-weight="900" fill="#6b4a12">₩</text><circle cx="15.5" cy="15" r="5.5" fill="#cfe3da" stroke="#2e9d5b" stroke-width=".8"/><text x="15.5" y="17.6" text-anchor="middle" font-size="7" font-weight="900" fill="#1f5c3a">$</text></svg>`,
+  port:`<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" fill="none" stroke="#1d2a4a" stroke-width="1.6"/><path d="M12 7v13M8 10h8M4.5 13.5c0 4 3.5 6.5 7.5 6.5s7.5-2.5 7.5-6.5" fill="none" stroke="#1d2a4a" stroke-width="1.8" stroke-linecap="round"/></svg>`,
   bank:`<svg viewBox="0 0 24 24"><path d="M12 2l10 5v2H2V7z" fill="currentColor"/><path d="M4 10h3v8H4zM10.5 10h3v8h-3zM17 10h3v8h-3zM2 19h20v3H2z" fill="currentColor"/></svg>`,
   deal:`<svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   music:`<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="17.5" cy="16" r="2.6" fill="currentColor"/></svg>`,
@@ -791,6 +812,8 @@ const IC={
 const _st=(cx,cy,r,f)=>{let d='';for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,rr=k%2?r*.42:r;d+=(k?'L':'M')+(cx+Math.cos(a)*rr).toFixed(2)+' '+(cy+Math.sin(a)*rr).toFixed(2)}return `<path d="${d}Z" fill="${f}"/>`};
 const _ujack=(w,h)=>`<rect width="${w}" height="${h}" fill="#012169"/><path d="M0 0L${w} ${h}M${w} 0L0 ${h}" stroke="#fff" stroke-width="${h*.2}"/><path d="M0 0L${w} ${h}M${w} 0L0 ${h}" stroke="#C8102E" stroke-width="${h*.08}"/><path d="M${w/2} 0V${h}M0 ${h/2}H${w}" stroke="#fff" stroke-width="${h*.33}"/><path d="M${w/2} 0V${h}M0 ${h/2}H${w}" stroke="#C8102E" stroke-width="${h*.2}"/>`;
 const FLAGS={
+ MX:`<rect width="10" height="20" fill="#006847"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE1126"/><circle cx="15" cy="10" r="2.2" fill="#8C5A2B"/><path d="M12.6 11.2q2.4 2.2 4.8 0" stroke="#006847" stroke-width=".7" fill="none"/>`,
+ IN:`<rect width="30" height="6.67" fill="#FF9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.33" width="30" height="6.67" fill="#138808"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".6"/><circle cx="15" cy="10" r=".6" fill="#000080"/>`,
  TW:`<rect width="30" height="20" fill="#FE0000"/><rect width="15" height="10" fill="#000095"/><circle cx="7.5" cy="5" r="2.6" fill="#fff"/><circle cx="7.5" cy="5" r="1.7" fill="#000095"/><circle cx="7.5" cy="5" r="1.4" fill="#fff"/>`,
  PH:`<rect width="30" height="10" fill="#0038A8"/><rect y="10" width="30" height="10" fill="#CE1126"/><path d="M0 0L17 10 0 20Z" fill="#fff"/><circle cx="5.5" cy="10" r="2" fill="#FCD116"/>`,
  CN:`<rect width="30" height="20" fill="#DE2910"/>${_st(5,5,3,'#FFDE00')}${_st(10,2,1,'#FFDE00')}${_st(12,4,1,'#FFDE00')}${_st(12,7,1,'#FFDE00')}${_st(10,9,1,'#FFDE00')}`,
@@ -818,9 +841,9 @@ const FLAGS={
    <g transform="translate(24.5 4.6) rotate(56.3)"><rect x="-2.5" y="-1.5" width="5" height=".7"/><rect x="-2.5" y="-.35" width="2.2" height=".7"/><rect x=".3" y="-.35" width="2.2" height=".7"/><rect x="-2.5" y=".8" width="5" height=".7"/></g>
    <g transform="translate(5.5 15.4) rotate(56.3)"><rect x="-2.5" y="-1.5" width="2.2" height=".7"/><rect x=".3" y="-1.5" width="2.2" height=".7"/><rect x="-2.5" y="-.35" width="5" height=".7"/><rect x="-2.5" y=".8" width="2.2" height=".7"/><rect x=".3" y=".8" width="2.2" height=".7"/></g></g>`,
 };
-const CITY_FLAG={1:'TW',3:'PH',6:'CN',8:'TH',9:'VN',11:'EG',13:'TR',14:'GR',16:'RU',18:'DE',19:'IT',21:'ES',23:'FR',24:'GB',26:'AU',27:'CA',29:'BR',31:'JP',32:'SG',34:'AE',37:'US',39:'KR'};
+const CITY_FLAG={1:'VN',2:'PH',4:'TH',6:'TW',7:'CN',8:'JP',10:'EG',11:'TR',13:'AE',15:'GR',16:'IT',17:'ES',19:'RU',20:'DE',22:'FR',24:'MX',25:'BR',26:'CA',28:'IN',29:'SG',30:'AU',33:'GB',34:'US',35:'KR'};
 const flagSVG=c=>`<span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="none">${FLAGS[c]}</svg></span>`;
-T.forEach((t,i)=>{if(CITY_FLAG[i])t.i=flagSVG(CITY_FLAG[i]);else if(t.t==='air')t.i=`<span class="flag ic2">${IC.air}</span>`;else if(t.t==='util')t.i=`<span class="flag ic2">${t.n.includes('전력')?IC.pow:IC.water}</span>`});
+T.forEach((t,i)=>{if(CITY_FLAG[i])t.i=flagSVG(CITY_FLAG[i]);else if(t.t==='air')t.i=`<span class="flag ic2">${isPort(i)?IC.port:IC.air}</span>`;else if(t.t==='util')t.i=`<span class="flag ic2">${t.n.includes('전력')?IC.pow:IC.water}</span>`});
 
 /* ================== 타이틀 히어로 일러스트 ================== */
 function heroSVG(){
@@ -854,8 +877,8 @@ function coinBurst(el,n){
   fxStart();
 }
 
-function tileIcon(t){if(t.t==='go')return IC.go;if(t.t==='jail')return IC.jail;if(t.t==='free')return IC.free;if(t.t==='gojail')return IC.gojail;if(t.t==='chance')return IC.chance;
-  if(t.t==='tax')return t.a>=200?IC.tax:IC.lux;if(t.t==='air')return IC.air;if(t.t==='util')return t.n.includes('전력')?IC.pow:IC.water;return ''}
+function tileIcon(t){if(t.t==='go')return IC.go;if(t.t==='jail')return IC.hold;if(t.t==='free')return IC.shop;if(t.t==='gojail')return IC.visa;if(t.t==='chance')return IC.stamp;if(t.t==='fx')return IC.fxc;
+  if(t.t==='tax')return IC.tax;if(t.t==='air')return T.indexOf(t)>=0&&isPort(T.indexOf(t))?IC.port:IC.air;if(t.t==='util')return t.n.includes('전력')?IC.pow:IC.water;return ''}
 const BRAND=(small)=>`<div class="brand"><div class="en">WORLD · TOUR · TYCOON</div><h1 style="${small?'font-size:26px':''}">세계일주 부동산왕</h1><div class="rule">◆</div></div>`;
 
 /* ================== 화면 ================== */
@@ -883,7 +906,7 @@ function renderMenu(){
   <div class="topbar"><span class="status">${navigator.onLine===false?'<b class="off">● 오프라인</b> · 그대로 플레이 가능':''}</span>${soundBtns()}</div>
   ${BRAND()}
   ${heroSVG()}
-  <div class="sub">세계의 도시를 사고, 랜드마크를 세우고, 경매와 협상으로 제국을 완성하세요</div>
+  <div class="sub">8개 대륙 24개 도시를 사고, 시티 아이콘을 세우고, 경매와 협상으로 여행 제국을 완성하세요</div>
   <div class="chips"><span>📴 인터넷 없이 플레이</span><span>🤖 AI 대전</span><span>👥 한 기기 최대 6인</span><span>💾 중간 저장</span></div>
   <div class="panel"><h3>PLAY</h3>
     <button class="btn pri full glow" style="font-size:16px;padding:14px" onclick="quickPlay()">▶ 바로 시작 · AI 2명과 대결</button>
@@ -904,14 +927,15 @@ function renderMenu(){
     <div class="row mt"><input id="scode" placeholder="저장 코드 붙여넣기 (WT1.…)" style="font-size:13px"><button class="btn" style="flex:0 0 96px" onclick="loadCode()">불러오기</button></div>
   </div>
   <div class="panel"><h3>RULES</h3><div class="note">
-  • 시작 자금 1,500만 · 출발 통과 시 +200만<br>
-  • 빈 땅 도착 시 <b>구매</b> 또는 <b>경매</b> — 경매는 모든 플레이어가 실시간 입찰, 마지막 입찰 후 5초 뒤 낙찰<br>
-  • <b>은행 담보대출</b>: 건물 없는 부동산을 맡기고 가격의 50% 대출 · 담보 중엔 통행료 없음 · 상환은 55%<br>
-  • <b>거래(딜)</b>: 내 차례에 다른 플레이어에게 부동산·현금 교환 제안, 상대가 수락하면 성사<br>
-  • 같은 색 도시 독점 → 통행료 2배, 건물 4채 → 랜드마크<br>
-  • 공항 25·50·100·200 / 공사 주사위×4(2곳 ×10)<br>
-  • 더블이면 한 번 더, 3연속은 무인도 · 무인도는 더블 또는 보석금 50<br>
-  • 현금 부족 시 건물 매각 → 자동 담보대출 → 그래도 부족하면 파산 (부동산은 채권자에게)<br>
+  • 36칸 월드 루트 · 8개 대륙 × 3개 도시 · 시작 자금 ${won(START_CASH)} · 월드 게이트 통과 시 +${SALARY}만<br>
+  • 빈 땅 도착 시 <b>구매</b> 또는 <b>경매</b> — 모두가 실시간 입찰, 마지막 입찰 5초 뒤 낙찰<br>
+  • 같은 대륙 3개 도시 독점 → 통행료 2배 · 4단계 개발(부티크 숍→오피스→레지던스→리조트) 후 <b>시티 아이콘</b><br>
+  • <b>☀ 관광 시즌</b>: 3라운드마다 한 대륙의 통행료가 1.5배<br>
+  • <b>교통 거점</b>(공항·항구) 보유 수에 따라 30·60·120·240 · <b>환전소</b>는 환율에 따라 이득 또는 손해<br>
+  • <b>관광세·벌금은 면세점 적립금</b>으로 쌓이고, 면세점에 도착한 사람이 모두 가져감<br>
+  • <b>여권 스탬프</b> 칸에서 여행 이벤트 카드 · <b>비자 만료</b> 칸은 입국 심사대로 이동<br>
+  • 입국 심사대: 더블 또는 수수료 ${BAIL}만, 최대 2턴 대기 · 더블은 한 턴에 1번만 추가 굴림<br>
+  • <b>은행 담보대출</b> 50% · 상환 55% / <b>거래(딜)</b> 부동산·현금 교환<br>
   • 최후의 1인 또는 라운드 종료 시 총자산 1위 우승</div></div>
   <div class="foot">© 2026 운명연구소 · 문의 support.um09@gmail.com<br>모든 캐릭터·그래픽·음악은 자체 제작 · 실제 도시와 국기는 배경 소재로만 사용</div>`;
   const nm=document.getElementById('nm');nm.oninput=()=>{myName=nm.value.trim().slice(0,8);LS.set('wt_name',myName)};
@@ -968,15 +992,15 @@ function renderLobby(){
   <button class="btn full" onclick="leave()">나가기</button>`;
 }
 window.copyCode=function(){try{navigator.clipboard.writeText(code).then(()=>toast('복사됨: '+code),()=>toast('코드: '+code))}catch(e){toast('코드: '+code)}};
-function rc(i){if(i<=10)return[11,11-i];if(i<=20)return[11-(i-10),1];if(i<=30)return[1,i-19];return[i-29,11]}
+function rc(i){if(i<=9)return[10,10-i];if(i<=18)return[10-(i-9),1];if(i<=27)return[1,i-17];return[i-26,10]}
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 function dieInner(n){return Array.from({length:9},(_,k)=>`<i class="${PIPS[n].includes(k)?'on':''}"></i>`).join('')}
 function tileHTML(i){
   const t=T[i],o=ownOf(S,i),h=hOf(S,i),mg=isMg(S,i);
-  const corner=['go','jail','free','gojail'].includes(t.t),dark=corner||t.t==='chance'||t.t==='tax';
+  const corner=['go','jail','free','gojail'].includes(t.t),dark=corner||t.t==='chance'||t.t==='tax'||t.t==='fx';
   const oc=o>=0?PCOL[S.pl[o].c%6]:null;
   let s=`<div class="tile ${corner?'corner':''} ${dark?'dark':''} ${h===5?'lm':''} ${mg?'mg':''} ${S.au&&S.au.i===i?'au':''}" id="tl${i}" style="grid-row:${rc(i)[0]};grid-column:${rc(i)[1]};${oc&&h<5&&!dark?`background:linear-gradient(180deg,#fbf7ec 45%,${oc}38)`:''}" onclick="showTile(${i})">`;
-  if(t.t==='city')s+=`<div class="bar" style="background-color:${GC[t.g]}"></div>`;
+  if(t.t==='city')s+=`<div class="bar" style="background-color:${GC[t.g]}">${S.hs===t.g?'<span class="sun">☀</span>':''}</div>`;
   if(t.t==='city')s+=(h>0?'':`<div class="ic">${t.i}</div>`);else s+=`<div class="si">${tileIcon(t)}</div>`;
   s+=`<div class="nm">${esc(t.s)}</div>`;
   if(BUYABLE.has(t.t)&&o<0)s+=`<div class="pr">${t.p}</div>`;
@@ -1006,8 +1030,8 @@ function renderGame(){
   if(S.ph==='over'){const w=S.pl[S.w];prompt=`<div style="font-family:'Noto Serif KR',serif;font-size:18px;font-weight:900;color:var(--gold2)">🏆 ${w?esc(w.n):'-'} 우승</div>`;acts=isHost?`<button class="btn pri glow" onclick="uiAct('newgame')">새 게임</button>`:''}
   else if(S.ph==='auction'){prompt=auBox()}
   else if(!mine){prompt=cur.k==='b'?'AI가 생각 중…':`<b>${esc(cur.n)}</b>님의 차례`}
-  else if(S.ph==='roll'){prompt=cur.j?`무인도 (${cur.j-1}/3) — 더블이면 탈출`:(S.again?'더블! 한 번 더 굴리세요':'주사위를 굴리세요');
-    acts=`<button class="btn pri glow" ${D} onclick="uiAct('roll')">주사위 굴리기</button>${cur.j&&cur.m>=50?`<button class="btn" ${D} onclick="uiAct('payjail')">보석금 50</button>`:''}`}
+  else if(S.ph==='roll'){prompt=cur.j?`입국 심사 대기 (${cur.j-1}/2) — 더블이면 통과`:(S.again?'더블! 한 번 더 굴리세요':'주사위를 굴리세요');
+    acts=`<button class="btn pri glow" ${D} onclick="uiAct('roll')">주사위 굴리기</button>${cur.j&&cur.m>=BAIL?`<button class="btn" ${D} onclick="uiAct('payjail')">심사 수수료 ${BAIL}</button>`:''}`}
   else if(S.ph==='buy'){const t=T[S.pend];prompt=`${t.i} <b>${esc(t.n)}</b> · ${won(t.p)}`;
     acts=`<button class="btn ok glow" ${D||(cur.m<t.p?'disabled':'')} onclick="uiAct('buy')">구매</button><button class="btn" ${D} onclick="uiAct('skip')">🔨 경매</button>`;
     if(cur.m<t.p)prompt+=`<div class="note" style="color:#f3c6a0;margin:0">현금 부족 — 은행 대출을 받아보세요</div>`}
@@ -1022,15 +1046,15 @@ function renderGame(){
     sub=`<button class="btn" onclick="openBank()"><span style="width:13px;display:inline-flex;color:var(--gold2)">${IC.bank}</span>은행</button>`;
     if(!tr&&['roll','buy','end'].includes(S.ph))sub+=`<button class="btn" onclick="openTrade()"><span style="width:13px;display:inline-flex;color:var(--gold2)">${IC.deal}</span>거래</button>`;
   }
-  let b='';for(let i=0;i<40;i++)b+=tileHTML(i);
+  let b='';for(let i=0;i<N;i++)b+=tileHTML(i);
   const rolling=Date.now()<diceUntil;
   b+=`<div class="center">${GLOBE}<svg class="cplane" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="44" ry="40" fill="none" stroke="#f3dc9a" stroke-width=".3" stroke-dasharray="1 2" opacity=".6"/><g><animateMotion dur="18s" repeatCount="indefinite" rotate="auto" path="M94 50A44 40 0 1 1 6 50A44 40 0 1 1 94 50"/><path d="M-3 0l4-.7 1.8-1.8h.9l-.9 1.8 1.8.2.7-.9h.6l-.4 1.4.4 1.4h-.6l-.7-.9-1.8.2.9 1.8h-.9l-1.8-1.8-4-.7z" fill="#f3dc9a" transform="rotate(90) scale(.9)"/></g></svg><div class="ttl">WORLD TYCOON</div>
-    <div class="rd">ROUND ${Math.min(S.rd,S.lim||S.rd)}${S.lim?' / '+S.lim:''}</div>
+    <div class="rd">ROUND ${Math.min(S.rd,S.lim||S.rd)}${S.lim?' / '+S.lim:''}${S.hs>=0?` · <span style="color:#fde68a">☀ ${GN[S.hs]}</span>`:''}${S.pot?` · 🛍 ${won(S.pot)}`:''}</div>
     <div class="turn">${cur.n?av(cur,22)+' '+esc(cur.n):''}</div>
     ${S.ph==='auction'?'':`<div class="dice ${rolling?'rolling':''}" id="dice"><div class="die">${dieInner(S.d[0])}</div><div class="die">${dieInner(S.d[1])}</div></div>`}
     <div class="prompt">${prompt}</div><div class="acts">${acts}</div><div class="subacts">${sub}</div>${trl?`<div class="subacts" style="align-items:center">${trl}</div>`:''}
     <div class="clog">${S.lg.slice(-2).map(l=>`<div>${esc(l)}</div>`).join('')}</div></div><div class="tokLayer" id="tokL"></div>`;
-  const pcs=S.pl.map((p,i)=>{const ln=loanOf(S,i);return `<div class="pc ${i===S.t&&S.ph!=='over'?'now':''} ${p.b?'dead':''}" id="pc${i}">${av(p,40)}<div style="flex:1;min-width:0"><div class="nmx">${esc(p.n)}${p.cid===myCid?' <span class="note">(나)</span>':''} ${p.k==='g'&&!p.on?'⚠️':''}</div><div class="m">${won(p.m)}</div><div class="s">총자산 ${won(worth(S,i))}${ln?` · 대출 ${won(ln)}`:''}${p.j?' · 무인도':''}</div></div></div>`}).join('');
+  const pcs=S.pl.map((p,i)=>{const ln=loanOf(S,i);return `<div class="pc ${i===S.t&&S.ph!=='over'?'now':''} ${p.b?'dead':''}" id="pc${i}">${av(p,40)}<div style="flex:1;min-width:0"><div class="nmx">${esc(p.n)}${p.cid===myCid?' <span class="note">(나)</span>':''} ${p.k==='g'&&!p.on?'⚠️':''}</div><div class="m">${won(p.m)}</div><div class="s">총자산 ${won(worth(S,i))}${ln?` · 대출 ${won(ln)}`:''}${p.j?' · 입국 심사':''}</div></div></div>`}).join('');
   app.innerHTML=`${statusBar()}<div class="board" id="board">${b}</div><div class="players">${pcs}</div>
    <div class="panel"><h3>HISTORY</h3><div class="log">${S.lg.slice().reverse().map(esc).join('<br>')}</div></div>
    <button class="btn full" onclick="if(confirmLeave())leave()">나가기</button>`;
@@ -1075,7 +1099,7 @@ function diffState(a,b){
   const lastLog=b.lg.slice(-3).join(' ');
   const traded=/거래 성사/.test(lastLog)&&a.tr&&!b.tr;
   if(b.rc!==a.rc){SFX.dice();diceUntil=Date.now()+700}
-  for(let i=0;i<40;i++){
+  for(let i=0;i<N;i++){
     if(a.o[i]!==b.o[i]&&ownOf(b,i)>=0&&!traded)q.push(()=>{SFX.coin();popTile(i);sparkTile(i)});
     if(traded&&a.o[i]!==b.o[i])q.push(()=>popTile(i));
     if(+b.h[i]>+a.h[i])q.push(()=>{SFX.build();popTile(i);sparkTile(i,+b.h[i]===5)});
@@ -1103,9 +1127,9 @@ function diffState(a,b){
 function popTile(i){const e=document.getElementById('tl'+i);if(e){e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}}
 function floatMoney(i,d){const e=document.getElementById('pc'+i);if(!e)return;const f=document.createElement('div');f.className='float '+(d>0?'up':'dn');f.textContent=(d>0?'+':'')+won(d);e.appendChild(f);if(d>=100)coinBurst(e,Math.min(26,8+Math.floor(d/40)));setTimeout(()=>f.remove(),1700)}
 function bigCard(text){const old=document.querySelector('.bigcard');if(old)old.remove();
-  const ic=/[+]|받기/.test(text)?IC.tax:/무인도|출국/.test(text)?IC.jail:/-|벌금|비/.test(text)?IC.lux:IC.air;
+  const ic=/입국 심사|비자/.test(text)?IC.visa:/[+]|받기|배당|우승/.test(text)?IC.tax:/-|요금|점검|보험/.test(text)?IC.lux:/시즌/.test(text)?IC.free:IC.air;
   const d=document.createElement('div');d.className='bigcard';
-  d.innerHTML=`<div class="e">${ic}</div><div class="tx"><div class="k">GOLDEN CHANCE</div><div class="m">${esc(text)}</div></div>`;
+  d.innerHTML=`<div class="e">${ic}</div><div class="tx"><div class="k">PASSPORT STAMP</div><div class="m">${esc(text)}</div></div>`;
   d.onclick=()=>d.remove();document.body.appendChild(d);setTimeout(()=>d.remove(),3200)}
 function banner(p,me){if(!p)return;const old=document.querySelector('.banner');if(old)old.remove();
   const d=document.createElement('div');d.className='banner';d.innerHTML=`<div class="in ${me?'me':''}">${av(p,44)}<span>${me?'당신의 차례':esc(p.n)+'의 차례'}</span></div>`;
@@ -1139,7 +1163,7 @@ setInterval(()=>{
   else{
     if(diceRc!==S.rc&&dEl){diceRc=S.rc;dEl.classList.remove('rolling');const ds=dEl.querySelectorAll('.die');ds[0].innerHTML=dieInner(S.d[0]);ds[1].innerHTML=dieInner(S.d[1]);dEl.classList.remove('land');void dEl.offsetWidth;dEl.classList.add('land')}
     let hop=-1,fly=-1;
-    S.pl.forEach((p,i)=>{if(disp[i]===undefined)disp[i]=p.p;if(disp[i]!==p.p&&!p.b){const f=(p.p-disp[i]+40)%40;if(f>12){disp[i]=p.p;fly=i}else{disp[i]=(disp[i]+1)%40;hop=i}moving=true}});
+    S.pl.forEach((p,i)=>{if(disp[i]===undefined)disp[i]=p.p;if(disp[i]!==p.p&&!p.b){const f=(p.p-disp[i]+N)%N;if(f>12){disp[i]=p.p;fly=i}else{disp[i]=(disp[i]+1)%N;hop=i}moving=true}});
     if(hop>=0||fly>=0){placeAll(hop,fly,false);if(hop>=0)SFX.step();else SFX.card()}
   }
   if(S.au){const left=Math.max(0,auEndLocal-now);const te=document.getElementById('autime'),be=document.getElementById('aubar');
@@ -1164,36 +1188,36 @@ function refreshSheet(){
   else if(sheetMode==='offer'){if(!S.tr||!ctrlP(S,S.tr.to))closeSheet();else openOffer(true)}
   else if(sheetMode==='trade'){if(S.tr||!['roll','buy','end'].includes(S.ph))closeSheet()}
 }
-const sw=i=>T[i].t==='city'?GC[T[i].g]:T[i].t==='air'?'#64748b':'#3b82c4';
-function propLine(i){const h=hOf(S,i);return `${T[i].i} ${esc(T[i].n)}<small>${T[i].t==='city'?`정가 ${T[i].p}`:T[i].t==='air'?'공항':'공사'}${h?` · ${h===5?'랜드마크':'건물 '+h}`:''}${isMg(S,i)?' · <span style="color:#f08b8b">담보 중</span>':''}</small>`}
+const sw=i=>T[i].t==='city'?GC[T[i].g]:'#64748b';
+function propLine(i){const h=hOf(S,i);return `${T[i].i} ${esc(T[i].n)}<small>${T[i].t==='city'?`${GN[T[i].g]} · 정가 ${T[i].p}`:isPort(i)?'항구':'공항'}${h?` · ${LV[h]}`:''}${isMg(S,i)?' · <span style="color:#f08b8b">담보 중</span>':''}</small>`}
 
 window.showTile=function(i,refresh){
   if(!S)return;if(!refresh)SFX.click();const t=T[i],o=ownOf(S,i),h=hOf(S,i),mg=isMg(S,i);const me=actorIdx();const mine=iControl(S);
   let body='';
   if(t.t==='city'){const b=rb(t.p);
-    const rows=[['땅만',b],['색 독점(땅만)',b*2],['건물 1',b*MULT[1]],['건물 2',b*MULT[2]],['건물 3',b*MULT[3]],['건물 4',b*MULT[4]],['랜드마크',b*MULT[5]]];
+    const rows=[['부지만',b],['대륙 독점(부지)',b*2],[LV[1],b*MULT[1]],[LV[2],b*MULT[2]],[LV[3],b*MULT[3]],[LV[4],b*MULT[4]],['★ '+LV[5],b*MULT[5]]];
     const cur=o<0||mg?-1:h===0?(fullGroup(S,o,t.g)?1:0):h+1;
-    body=`<table>${rows.map((r,k)=>`<tr class="${k===cur?'hl':''}"><td>${r[0]}</td><td>${won(r[1])}</td></tr>`).join('')}<tr><td>가격 · 건물비</td><td>${won(t.p)} · ${won(HC[t.g])}</td></tr><tr><td>담보대출 / 상환</td><td>${won(t.p/2)} / ${won(unmCost(i))}</td></tr></table>`;
-  }else if(t.t==='air')body=`<table><tr><td>공항 1곳</td><td>25만</td></tr><tr><td>2곳</td><td>50만</td></tr><tr><td>3곳</td><td>100만</td></tr><tr><td>4곳</td><td>200만</td></tr><tr><td>가격</td><td>${won(t.p)}</td></tr><tr><td>담보대출 / 상환</td><td>${won(t.p/2)} / ${won(unmCost(i))}</td></tr></table>`;
+    body=`<table>${rows.map((r,k)=>`<tr class="${k===cur?'hl':''}"><td>${r[0]}</td><td>${won(r[1])}</td></tr>`).join('')}${S.hs===t.g?'<tr class="hl"><td>☀ 관광 시즌</td><td>통행료 ×1.5</td></tr>':''}<tr><td>가격 · 개발비</td><td>${won(t.p)} · ${won(HC[t.g])}</td></tr><tr><td>담보대출 / 상환</td><td>${won(t.p/2)} / ${won(unmCost(i))}</td></tr></table>`;
+  }else if(t.t==='air')body=`<table><tr><td>교통 거점 1곳</td><td>30만</td></tr><tr><td>2곳</td><td>60만</td></tr><tr><td>3곳</td><td>120만</td></tr><tr><td>4곳</td><td>240만</td></tr><tr><td>가격</td><td>${won(t.p)}</td></tr><tr><td>담보대출 / 상환</td><td>${won(t.p/2)} / ${won(unmCost(i))}</td></tr></table>`;
   else if(t.t==='util')body=`<table><tr><td>1곳</td><td>주사위 × 4</td></tr><tr><td>2곳</td><td>주사위 × 10</td></tr><tr><td>가격</td><td>${won(t.p)}</td></tr><tr><td>담보대출 / 상환</td><td>${won(t.p/2)} / ${won(unmCost(i))}</td></tr></table>`;
-  else body=`<p class="note" style="font-size:14px">${({go:'지나가거나 도착하면 200만을 받습니다.',jail:'무인도. 더블이 나오거나 보석금 50을 내면 탈출. 3턴 후 자동 탈출.',free:'편히 쉬어가는 라운지입니다.',gojail:'도착하면 무인도로 바로 이동!',chance:'황금찬스 카드를 한 장 뽑습니다.',tax:`세금 ${won(t.a||0)}을 냅니다.`})[t.t]}</p>`;
+  else body=`<p class="note" style="font-size:14px">${({go:`지나가거나 도착하면 ${SALARY}만을 받습니다.`,jail:`입국 심사대. 더블이 나오거나 수수료 ${BAIL}만을 내면 통과, 최대 2턴 대기.`,free:`면세점. 도착하면 쌓인 적립금(현재 ${won(S.pot||0)})을 모두 가져갑니다.`,gojail:'비자 만료! 도착하면 입국 심사대로 이동합니다.',chance:'여권 스탬프를 받고 여행 이벤트 카드를 한 장 뽑습니다.',fx:'환율에 따라 돈을 벌거나 잃습니다. 손실은 면세점 적립금으로 쌓입니다.',tax:`관광세 ${won(t.a||0)} — 면세점 적립금으로 쌓입니다.`})[t.t]}</p>`;
   let btns='';
   if(o>=0&&o===me){
-    if(t.t==='city'&&mine&&o===S.t)btns+=`<div class="row mt"><button class="btn ok" ${canBuild(S,me,i)?'':'disabled'} onclick="uiAct('build',${i})">${h===4?'랜드마크':'건물'} 짓기 · ${won(HC[t.g])}</button><button class="btn" ${canSell(S,me,i)?'':'disabled'} onclick="uiAct('sell',${i})">건물 매각 +${won(HC[t.g]/2)}</button></div>`;
+    if(t.t==='city'&&mine&&o===S.t)btns+=`<div class="row mt"><button class="btn ok" ${canBuild(S,me,i)?'':'disabled'} onclick="uiAct('build',${i})">🏗 ${LV[Math.min(5,h+1)]} · ${won(HC[t.g])}</button><button class="btn" ${canSell(S,me,i)?'':'disabled'} onclick="uiAct('sell',${i})">시설 매각 +${won(HC[t.g]/2)}</button></div>`;
     btns+=`<div class="row mt">${mg?`<button class="btn pri" ${canUnmort(S,me,i)?'':'disabled'} onclick="uiAct('unmort',${i},${me})">대출 상환 · ${won(unmCost(i))}</button>`:`<button class="btn" ${canMort(S,me,i)?'':'disabled'} onclick="uiAct('mort',${i},${me})">🏦 담보대출 +${won(t.p/2)}</button>`}</div>`;
-    if(t.t==='city'&&!fullGroup(S,me,t.g))btns+='<p class="note">같은 색 도시를 모두 가져야 건물을 지을 수 있어요.</p>';
-    else if(!mg&&!groupBare(S,i))btns+='<p class="note">건물이 있는 색 그룹은 담보로 맡길 수 없어요.</p>';
+    if(t.t==='city'&&!fullGroup(S,me,t.g))btns+='<p class="note">같은 대륙 도시 3곳을 모두 가져야 개발할 수 있어요.</p>';
+    else if(!mg&&!groupBare(S,i))btns+='<p class="note">개발 시설이 있는 대륙 그룹은 담보로 맡길 수 없어요.</p>';
   }
   const big=!BUYABLE.has(t.t);
   openSheet('tile:'+i,`${big?`<div style="width:90px;margin:6px auto;padding:14px;border-radius:20px;background:linear-gradient(160deg,#172340,#0d1529);border:1px solid var(--gold)">${tileIcon(t)}</div>`:skyline(i)}
    <div class="hd">${t.t==='city'?`<span style="width:12px;height:22px;border-radius:3px;background:${GC[t.g]}"></span>`:''}${t.t==='city'?t.i:''} ${esc(t.n)}</div>
-   ${o>=0?`<p class="note" style="display:flex;align-items:center;gap:6px">소유 ${av(S.pl[o],24)} <b style="color:var(--tx)">${esc(S.pl[o].n)}</b>${h?` · ${h===5?'랜드마크':'건물 '+h}`:''}${mg?' · <span style="color:#f08b8b">은행 담보 중</span>':''}</p>`:BUYABLE.has(t.t)?'<p class="note">아직 주인이 없습니다</p>':''}
+   ${o>=0?`<p class="note" style="display:flex;align-items:center;gap:6px">소유 ${av(S.pl[o],24)} <b style="color:var(--tx)">${esc(S.pl[o].n)}</b>${h?` · ${LV[h]}`:''}${mg?' · <span style="color:#f08b8b">은행 담보 중</span>':''}</p>`:BUYABLE.has(t.t)?'<p class="note">아직 주인이 없습니다</p>':''}
    ${body}${btns}<button class="btn full mt" onclick="closeSheet()">닫기</button>`);
 };
 
 window.openBank=function(refresh){
   if(!S)return;if(!refresh)SFX.click();const me=actorIdx();const p=S.pl[me];if(!p)return;
-  const props=[];for(let i=0;i<40;i++)if(ownOf(S,i)===me)props.push(i);
+  const props=[];for(let i=0;i<N;i++)if(ownOf(S,i)===me)props.push(i);
   const rows=props.map(i=>{const mg=isMg(S,i);
     const btn=mg?`<button class="btn sm pri" ${canUnmort(S,me,i)?'':'disabled'} onclick="uiAct('unmort',${i},${me})">상환 ${unmCost(i)}</button>`
       :`<button class="btn sm" ${canMort(S,me,i)?'':'disabled'} onclick="uiAct('mort',${i},${me})">대출 +${T[i].p/2}</button>`;
@@ -1202,7 +1226,7 @@ window.openBank=function(refresh){
   openSheet('bank',`<div class="hd"><span style="width:26px;color:var(--gold2);display:inline-flex">${IC.bank}</span>세계중앙은행</div>
    <div class="note" style="margin-top:-4px">${av(p,18)} ${esc(p.n)}님의 계좌</div>
    <div class="stat"><span>현금</span><b>${won(p.m)}</b></div><div class="stat"><span>대출 잔액</span><b style="color:#f08b8b">${won(ln)}</b></div><div class="stat"><span>총자산</span><b>${won(worth(S,me))}</b></div>
-   <p class="note">건물이 없는 부동산을 담보로 가격의 50%를 즉시 빌릴 수 있어요. 담보 중인 땅은 통행료를 받지 못하며, 상환 시 원금에 이자 10%가 붙습니다.</p>
+   <p class="note">개발 시설이 없는 부동산을 담보로 가격의 50%를 즉시 빌릴 수 있어요. 담보 중인 땅은 통행료를 받지 못하며, 상환 시 원금에 이자 10%가 붙습니다.</p>
    <div class="plist2">${rows||'<p class="note">보유한 부동산이 없습니다.</p>'}</div>
    <button class="btn full mt" onclick="closeSheet()">닫기</button>`);
 };
@@ -1219,7 +1243,7 @@ window.openTrade=function(){
 function renderTrade(){
   const me=draft.f,to=draft.to,P=S.pl[me],Q=S.pl[to];
   const others=S.pl.map((p,k)=>k).filter(k=>k!==me&&!S.pl[k].b);
-  const list=(pi,key)=>{const arr=[];for(let i=0;i<40;i++)if(ownOf(S,i)===pi)arr.push(i);
+  const list=(pi,key)=>{const arr=[];for(let i=0;i<N;i++)if(ownOf(S,i)===pi)arr.push(i);
     return arr.map(i=>{const ok=tradable(S,pi,i),on=draft[key].includes(i);
       return `<label class="prow ${on?'sel':''}" style="${ok?'':'opacity:.4'}"><input type="checkbox" ${on?'checked':''} ${ok?'':'disabled'} onchange="dTog('${key}',${i})"><span class="sw" style="background:${sw(i)}"></span><div class="t">${propLine(i)}</div></label>`}).join('')||'<p class="note">부동산 없음</p>'};
   const valid=(draft.g.length||draft.r.length)&&(draft.g.length||draft.gm)&&(draft.r.length||draft.rm);
@@ -1231,7 +1255,7 @@ function renderTrade(){
      if(Q.k!=='b')return '';const sc=tradeScore(S,{f:me,to,g:draft.g,r:draft.r,gm:draft.gm,rm:draft.rm});
      const lv=sc>=1.05?['높음','#7ee2b3']:sc>=.9?['애매함 — 현금을 조금 더','#f3dc9a']:['낮음 — 조건을 올려보세요','#f08b8b'];
      return `<p class="note">AI 수락 가능성: <b style="color:${lv[1]}">${lv[0]}</b></p>`})()}
-   <p class="note">건물이 있는 색 그룹의 땅은 거래할 수 없습니다. 담보 상태는 그대로 넘어갑니다. 상대가 사람이면 자기 화면에서 수락/거절합니다.</p>
+   <p class="note">개발 시설이 있는 대륙 그룹의 땅은 거래할 수 없습니다. 담보 상태는 그대로 넘어갑니다. 상대가 사람이면 자기 화면에서 수락/거절합니다.</p>
    <div class="row"><button class="btn" onclick="closeSheet()">취소</button><button class="btn pri" ${valid?'':'disabled'} onclick="sendTrade()">제안 보내기</button></div>`);
 }
 window.dTo=k=>{draft={f:draft.f,to:k,g:[],r:[],gm:0,rm:0};SFX.click();renderTrade()};
