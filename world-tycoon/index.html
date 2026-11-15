@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>세계일주 부동산왕</title>
+<title>세계일주 부동산왕 — 오프라인 월드 부동산 보드게임</title>
+<meta name="description" content="세계 22개 도시를 사고 랜드마크를 세우는 부동산 보드게임. 경매·담보대출·거래, AI 대전, 한 기기 6인 플레이. 설치 없이 바로, 인터넷 없이도 즐기세요.">
+<meta name="theme-color" content="#0b1222">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="부동산왕">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:type" content="website">
+<meta property="og:title" content="세계일주 부동산왕 — WORLD TOUR TYCOON">
+<meta property="og:description" content="도시를 사고, 랜드마크를 세우고, 경매와 협상으로 세계 부동산 제국을 완성하세요. 무료 · 설치 없이 · 오프라인 플레이.">
+<meta property="og:image" content="https://morogohi.github.io/world-tycoon/og.png">
+<meta property="og:url" content="https://morogohi.github.io/world-tycoon/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -173,6 +188,15 @@ tr.hl td{color:var(--gold2)}
 .stat b{color:var(--gold2)}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#0e1628;border:1px solid var(--gold);color:var(--gold2);padding:9px 16px;border-radius:12px;font-size:13.5px;z-index:40;animation:fadeup .2s;box-shadow:0 10px 24px rgba(0,0,0,.5)}
 .hidden{display:none!important}
+.flag{display:inline-block;width:1.5em;height:1em;vertical-align:-.12em;border-radius:2px;overflow:hidden;box-shadow:0 0 0 .6px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25);line-height:0}
+.flag svg{width:100%;height:100%;display:block}
+.flag.ic2{width:1.15em;height:1.15em;border-radius:4px;background:#f7f1e3;padding:1px;box-shadow:none;vertical-align:-.2em}
+.tile .ic .flag{width:1.6em;height:1.07em}
+.hero{width:100%;display:block;margin:4px 0 2px;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 1px rgba(217,180,90,.35)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:-4px 0 6px}
+.chips span{font-size:11.5px;padding:5px 10px;border-radius:20px;border:1px solid var(--gl);background:rgba(255,255,255,.04);color:var(--gold2)}
+.foot{text-align:center;font-size:11px;color:#6b7386;line-height:1.7;margin:18px 0 6px}
+.cplane{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.55}
 .bigcard{position:fixed;left:50%;top:16%;z-index:30;width:min(88vw,340px);transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;cursor:pointer;
   background:linear-gradient(160deg,#fffaf0,#efe0b6);border:1.5px solid var(--gold3);box-shadow:inset 0 0 0 4px #fffaf0,inset 0 0 0 5px rgba(217,180,90,.7),0 16px 40px rgba(0,0,0,.6),0 0 30px rgba(217,180,90,.35);
   animation:cardin 3.2s ease forwards}
@@ -730,7 +754,7 @@ function skyline(i){
     <radialGradient id="sun${i}" cx=".5" cy=".85" r=".6"><stop offset="0" stop-color="#fff1c2" stop-opacity=".7"/><stop offset="1" stop-color="#fff1c2" stop-opacity="0"/></radialGradient></defs>
     <rect width="320" height="160" fill="url(#sk${i})"/><rect width="320" height="160" fill="url(#sun${i})"/>${starz}${clouds}${city}
     <rect y="134" width="320" height="26" fill="#0d1a16"/><rect y="133" width="320" height="1.5" fill="#d9b45a" opacity=".8"/>${art}
-    <text x="12" y="153" font-size="16">${t.i}</text><text x="308" y="152" text-anchor="end" font-family="Cinzel,serif" font-size="10" letter-spacing="3" fill="#d9b45a">${esc(t.t==='city'?'CITY ESTATE':t.t==='air'?'AIRPORT':'UTILITY')}</text></svg>`;
+    ${CITY_FLAG[i]?`<svg x="10" y="140.5" width="21" height="14" viewBox="0 0 30 20" preserveAspectRatio="none">${FLAGS[CITY_FLAG[i]]}</svg>`:''}<text x="308" y="152" text-anchor="end" font-family="Cinzel,serif" font-size="10" letter-spacing="3" fill="#d9b45a">${esc(t.t==='city'?'CITY ESTATE':t.t==='air'?'AIRPORT':'UTILITY')}</text></svg>`;
 }
 const GLOBE=`<svg class="globe" viewBox="0 0 100 100"><g fill="none" stroke="#f3dc9a" stroke-width=".5"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="20" ry="46"/><ellipse cx="50" cy="50" rx="36" ry="46"/><path d="M4 50h92M9 30h82M9 70h82M20 14h60M20 86h60"/></g></svg>`;
 
@@ -762,6 +786,74 @@ const IC={
   save:`<svg viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 3v5h7V3M8 21v-7h8v7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`,
   sfx:`<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`,
 };
+
+/* ================== SVG 국기 (모든 OS에서 동일하게 보이도록) ================== */
+const _st=(cx,cy,r,f)=>{let d='';for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,rr=k%2?r*.42:r;d+=(k?'L':'M')+(cx+Math.cos(a)*rr).toFixed(2)+' '+(cy+Math.sin(a)*rr).toFixed(2)}return `<path d="${d}Z" fill="${f}"/>`};
+const _ujack=(w,h)=>`<rect width="${w}" height="${h}" fill="#012169"/><path d="M0 0L${w} ${h}M${w} 0L0 ${h}" stroke="#fff" stroke-width="${h*.2}"/><path d="M0 0L${w} ${h}M${w} 0L0 ${h}" stroke="#C8102E" stroke-width="${h*.08}"/><path d="M${w/2} 0V${h}M0 ${h/2}H${w}" stroke="#fff" stroke-width="${h*.33}"/><path d="M${w/2} 0V${h}M0 ${h/2}H${w}" stroke="#C8102E" stroke-width="${h*.2}"/>`;
+const FLAGS={
+ TW:`<rect width="30" height="20" fill="#FE0000"/><rect width="15" height="10" fill="#000095"/><circle cx="7.5" cy="5" r="2.6" fill="#fff"/><circle cx="7.5" cy="5" r="1.7" fill="#000095"/><circle cx="7.5" cy="5" r="1.4" fill="#fff"/>`,
+ PH:`<rect width="30" height="10" fill="#0038A8"/><rect y="10" width="30" height="10" fill="#CE1126"/><path d="M0 0L17 10 0 20Z" fill="#fff"/><circle cx="5.5" cy="10" r="2" fill="#FCD116"/>`,
+ CN:`<rect width="30" height="20" fill="#DE2910"/>${_st(5,5,3,'#FFDE00')}${_st(10,2,1,'#FFDE00')}${_st(12,4,1,'#FFDE00')}${_st(12,7,1,'#FFDE00')}${_st(10,9,1,'#FFDE00')}`,
+ TH:`<rect width="30" height="20" fill="#A51931"/><rect y="3.33" width="30" height="13.33" fill="#F4F5F8"/><rect y="6.67" width="30" height="6.67" fill="#2D2A4A"/>`,
+ VN:`<rect width="30" height="20" fill="#DA251D"/>${_st(15,10.4,6,'#FFFF00')}`,
+ EG:`<rect width="30" height="6.67" fill="#CE1126"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.33" width="30" height="6.67" fill="#000"/><path d="M13.5 8h3l-.5 3.5h-2z" fill="#C09300"/>`,
+ TR:`<rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#E30A17"/>${_st(17.3,10,2.2,'#fff')}`,
+ GR:`<rect width="30" height="20" fill="#0D5EAF"/>${[1,3,5,7].map(k=>`<rect y="${k*20/9}" width="30" height="${20/9}" fill="#fff"/>`).join('')}<rect width="11.1" height="11.1" fill="#0D5EAF"/><path d="M5.55 0v11.1M0 5.55h11.1" stroke="#fff" stroke-width="2.2"/>`,
+ RU:`<rect width="30" height="6.67" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039A6"/><rect y="13.33" width="30" height="6.67" fill="#D52B1E"/>`,
+ DE:`<rect width="30" height="6.67" fill="#000"/><rect y="6.67" width="30" height="6.67" fill="#DD0000"/><rect y="13.33" width="30" height="6.67" fill="#FFCE00"/>`,
+ IT:`<rect width="10" height="20" fill="#009246"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE2B37"/>`,
+ ES:`<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/><rect x="7" y="7.5" width="3" height="5" rx=".6" fill="#AA151B" opacity=".75"/>`,
+ FR:`<rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ED2939"/>`,
+ GB:_ujack(30,20),
+ AU:`<rect width="30" height="20" fill="#012169"/><svg width="15" height="10" viewBox="0 0 15 10">${_ujack(15,10)}</svg>${_st(7.5,15,2.2,'#fff')}${_st(22.5,15.5,1.1,'#fff')}${_st(20,8.5,1.1,'#fff')}${_st(22.5,3.5,1.1,'#fff')}${_st(25.5,7.5,1.1,'#fff')}`,
+ CA:`<rect width="30" height="20" fill="#fff"/><rect width="7.5" height="20" fill="#D52B1E"/><rect x="22.5" width="7.5" height="20" fill="#D52B1E"/><path d="M15 4l1.2 2.3 1.5-.5-.5 3.2 1.8-1.6.6 1.2 1.8-.3-.8 2 1 .5-3.6 2.6.3 1.2H15.5V17h-1v-2.4h-2.8l.3-1.2-3.6-2.6 1-.5-.8-2 1.8.3.6-1.2 1.8 1.6-.5-3.2 1.5.5z" fill="#D52B1E"/>`,
+ BR:`<rect width="30" height="20" fill="#009C3B"/><path d="M15 2.5L27.5 10 15 17.5 2.5 10Z" fill="#FFDF00"/><circle cx="15" cy="10" r="4.2" fill="#002776"/><path d="M11 9.2q4-1.4 8 .8" stroke="#fff" stroke-width=".7" fill="none"/>`,
+ JP:`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>`,
+ SG:`<rect width="30" height="10" fill="#EF3340"/><rect y="10" width="30" height="10" fill="#fff"/><circle cx="6.5" cy="5" r="3.3" fill="#fff"/><circle cx="7.8" cy="5" r="3.1" fill="#EF3340"/>${[[10.3,3],[12.3,4.4],[11.6,6.6],[9,6.6],[8.3,4.4]].map(([x,y])=>_st(x,y,.75,'#fff')).join('')}`,
+ AE:`<rect width="30" height="6.67" fill="#00732F"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.33" width="30" height="6.67" fill="#000"/><rect width="8" height="20" fill="#FF0000"/>`,
+ US:`<rect width="30" height="20" fill="#fff"/>${[0,2,4,6,8,10,12].map(k=>`<rect y="${k*20/13}" width="30" height="${20/13}" fill="#B22234"/>`).join('')}<rect width="12" height="10.77" fill="#3C3B6E"/>${Array.from({length:20},(_,k)=>`<circle cx="${1.2+(k%5)*2.4+(Math.floor(k/5)%2)*1.2}" cy="${1.3+Math.floor(k/5)*2.6}" r=".45" fill="#fff"/>`).join('')}`,
+ KR:`<rect width="30" height="20" fill="#fff"/><g transform="translate(15 10) rotate(33.7)"><path d="M-5 0a5 5 0 0 1 10 0z" fill="#CD2E3A"/><path d="M-5 0a5 5 0 0 0 10 0z" fill="#0047A0"/><circle cx="-2.5" cy="0" r="2.5" fill="#CD2E3A"/><circle cx="2.5" cy="0" r="2.5" fill="#0047A0"/></g>
+   <g fill="#000"><g transform="translate(5.5 4.6) rotate(-56.3)"><rect x="-2.5" y="-1.5" width="5" height=".7"/><rect x="-2.5" y="-.35" width="5" height=".7"/><rect x="-2.5" y=".8" width="5" height=".7"/></g>
+   <g transform="translate(24.5 15.4) rotate(-56.3)"><rect x="-2.5" y="-1.5" width="2.2" height=".7"/><rect x=".3" y="-1.5" width="2.2" height=".7"/><rect x="-2.5" y="-.35" width="2.2" height=".7"/><rect x=".3" y="-.35" width="2.2" height=".7"/><rect x="-2.5" y=".8" width="2.2" height=".7"/><rect x=".3" y=".8" width="2.2" height=".7"/></g>
+   <g transform="translate(24.5 4.6) rotate(56.3)"><rect x="-2.5" y="-1.5" width="5" height=".7"/><rect x="-2.5" y="-.35" width="2.2" height=".7"/><rect x=".3" y="-.35" width="2.2" height=".7"/><rect x="-2.5" y=".8" width="5" height=".7"/></g>
+   <g transform="translate(5.5 15.4) rotate(56.3)"><rect x="-2.5" y="-1.5" width="2.2" height=".7"/><rect x=".3" y="-1.5" width="2.2" height=".7"/><rect x="-2.5" y="-.35" width="5" height=".7"/><rect x="-2.5" y=".8" width="2.2" height=".7"/><rect x=".3" y=".8" width="2.2" height=".7"/></g></g>`,
+};
+const CITY_FLAG={1:'TW',3:'PH',6:'CN',8:'TH',9:'VN',11:'EG',13:'TR',14:'GR',16:'RU',18:'DE',19:'IT',21:'ES',23:'FR',24:'GB',26:'AU',27:'CA',29:'BR',31:'JP',32:'SG',34:'AE',37:'US',39:'KR'};
+const flagSVG=c=>`<span class="flag"><svg viewBox="0 0 30 20" preserveAspectRatio="none">${FLAGS[c]}</svg></span>`;
+T.forEach((t,i)=>{if(CITY_FLAG[i])t.i=flagSVG(CITY_FLAG[i]);else if(t.t==='air')t.i=`<span class="flag ic2">${IC.air}</span>`;else if(t.t==='util')t.i=`<span class="flag ic2">${t.n.includes('전력')?IC.pow:IC.water}</span>`});
+
+/* ================== 타이틀 히어로 일러스트 ================== */
+function heroSVG(){
+  const lm=[0,3,4,6,7,2,5,1];
+  const sky=lm.map((g,k)=>`<g transform="translate(${10+k*43},${150-(k%2?6:0)}) scale(${k%3===1?.44:.38})" opacity="${k===3||k===4?1:.78}"><path d="${LM[g]}" transform="translate(0,-100)" fill="url(#gold)" stroke="#6b4a12" stroke-width="2"/></g>`).join('');
+  const stars=Array.from({length:26},(_,k)=>{const x=(k*137)%360,y=(k*71)%92+6;return `<circle cx="${x}" cy="${y}" r="${k%4?0.7:1.3}" fill="#fff"><animate attributeName="opacity" values="1;.15;1" dur="${2+k%5*.6}s" begin="${k%7*.3}s" repeatCount="indefinite"/></circle>`}).join('');
+  return `<svg class="hero" viewBox="0 0 360 190" aria-hidden="true"><defs>
+   <radialGradient id="hsky" cx=".5" cy=".95" r=".9"><stop offset="0" stop-color="#3b2a56"/><stop offset=".45" stop-color="#14254a"/><stop offset="1" stop-color="#070b16"/></radialGradient>
+   <radialGradient id="hglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f3dc9a" stop-opacity=".45"/><stop offset="1" stop-color="#f3dc9a" stop-opacity="0"/></radialGradient>
+   <linearGradient id="hsea" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b6e8f"/><stop offset="1" stop-color="#0e2550"/></linearGradient></defs>
+   <rect width="360" height="190" rx="18" fill="url(#hsky)"/>${stars}
+   <circle cx="180" cy="86" r="70" fill="url(#hglow)"/>
+   <clipPath id="hclip"><circle r="45"/></clipPath><g transform="translate(180 86)"><circle r="46" fill="url(#hsea)" stroke="url(#gold)" stroke-width="1.6"/>
+    <g fill="#3fbf86" opacity=".85" clip-path="url(#hclip)"><path d="M-30-18c8-8 22-6 24 2s-6 10-4 18-12 6-16-2-12-10-4-18z"><animateTransform attributeName="transform" type="translate" values="-30 0;40 0" dur="16s" repeatCount="indefinite"/></path>
+    <path d="M6 4c8-4 18 0 18 10s-10 16-16 10-10-16-2-20z"><animateTransform attributeName="transform" type="translate" values="-50 0;30 0" dur="16s" repeatCount="indefinite"/></path></g>
+    <g fill="none" stroke="#f3dc9a" stroke-width=".5" opacity=".55"><ellipse rx="46" ry="16"/><ellipse rx="46" ry="34"/><ellipse rx="18" ry="46"><animate attributeName="rx" values="2;46;2" dur="8s" repeatCount="indefinite"/></ellipse><path d="M-46 0h92"/></g>
+    <circle r="46" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="10" transform="translate(4 4)" clip-path="none"/>
+    <ellipse rx="70" ry="22" fill="none" stroke="url(#gold)" stroke-width=".8" stroke-dasharray="2 4" transform="rotate(-14)"/>
+    <g transform="rotate(-14)"><g><animateMotion dur="7s" repeatCount="indefinite" rotate="auto" path="M70 0A70 22 0 1 1 -70 0A70 22 0 1 1 70 0"/>
+      <path d="M-7 0l9-1.6 4-4h2l-2 4 4 .4 1.6-2h1.4l-1 3 1 3h-1.4l-1.6-2-4 .4 2 4h-2l-4-4-9-1.6z" fill="#fff" transform="rotate(90) scale(.9)"/></g></g></g>
+   <g>${sky}</g><rect y="150" width="360" height="40" rx="0" fill="#070b16" opacity=".55"/><rect y="149.5" width="360" height="1" fill="url(#gold)" opacity=".8"/>
+   ${[[60,120],[300,110],[250,40],[90,48]].map(([x,y],k)=>`<path d="M${x} ${y-6}l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#f3dc9a"><animate attributeName="opacity" values="0;1;0" dur="${2.4+k*.5}s" begin="${k*.6}s" repeatCount="indefinite"/></path>`).join('')}
+  </svg>`;
+}
+
+/* ================== 코인 파티클 ================== */
+function coinBurst(el,n){
+  if(!el)return;const r=el.getBoundingClientRect();const cx=r.left+r.width*.25,cy=r.top+r.height/2;
+  for(let k=0;k<(n||14);k++){const a=-Math.PI/2+(Math.random()-.5)*2.2,v=2.5+Math.random()*3.5;
+    parts.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.16,s:7+Math.random()*3,rot:0,vr:0,c:'#f3c24a',life:60+Math.random()*25,coin:true})}
+  fxStart();
+}
+
 function tileIcon(t){if(t.t==='go')return IC.go;if(t.t==='jail')return IC.jail;if(t.t==='free')return IC.free;if(t.t==='gojail')return IC.gojail;if(t.t==='chance')return IC.chance;
   if(t.t==='tax')return t.a>=200?IC.tax:IC.lux;if(t.t==='air')return IC.air;if(t.t==='util')return t.n.includes('전력')?IC.pow:IC.water;return ''}
 const BRAND=(small)=>`<div class="brand"><div class="en">WORLD · TOUR · TYCOON</div><h1 style="${small?'font-size:26px':''}">세계일주 부동산왕</h1><div class="rule">◆</div></div>`;
@@ -788,22 +880,24 @@ function renderMenu(){
   const saved=(()=>{try{const s=JSON.parse(LS.get('wt_host')||'null');return s&&s.S&&s.S.ph!=='over'?s:null}catch(e){return null}})();
   const net=netState==='ok',chk=netState==='checking';
   app.innerHTML=`
-  <div class="topbar"><span></span>${soundBtns()}</div>
+  <div class="topbar"><span class="status">${navigator.onLine===false?'<b class="off">● 오프라인</b> · 그대로 플레이 가능':''}</span>${soundBtns()}</div>
   ${BRAND()}
+  ${heroSVG()}
   <div class="sub">세계의 도시를 사고, 랜드마크를 세우고, 경매와 협상으로 제국을 완성하세요</div>
+  <div class="chips"><span>📴 인터넷 없이 플레이</span><span>🤖 AI 대전</span><span>👥 한 기기 최대 6인</span><span>💾 중간 저장</span></div>
+  <div class="panel"><h3>PLAY</h3>
+    <button class="btn pri full glow" style="font-size:16px;padding:14px" onclick="quickPlay()">▶ 바로 시작 · AI 2명과 대결</button>
+    <div class="row mt"><button class="btn" onclick="go('local')">게임 설정하고 시작</button>${saved?`<button class="btn" onclick="go('resume')">이어하기</button>`:''}</div>
+    ${installUI()}
+  </div>
   <div class="panel"><h3>CHARACTER</h3>
     <div class="avpick">${AVN.map((n,i)=>`<button class="${i===myAv?'sel':''}" onclick="pickAv(${i})"><span class="av" style="width:100%;aspect-ratio:1">${avatarSVG(i,PCOL[i])}</span><div class="nm">${n}</div></button>`).join('')}</div>
     <input id="nm" class="mt" maxlength="8" placeholder="닉네임 (최대 8자)" value="${esc(myName)}"></div>
   <div class="panel"><h3>ONLINE</h3>
     ${chk?'<p class="note">네트워크 확인 중…</p>':''}
-    ${netState==='off'?'<p class="note">이 화면에서는 온라인 기능을 쓸 수 없습니다. claude.ai에서 이 페이지를 열면 친구와 함께할 수 있어요.</p>':''}
+    ${netState==='off'?'<p class="note">친구와 실시간 온라인 대전은 claude.ai 공유 버전에서 지원됩니다. 이 버전은 인터넷 없이도 AI 대전·한 기기 대전을 모두 즐길 수 있어요.</p>':''}
     <button class="btn pri full ${net?'glow':''}" ${net?'':'disabled'} onclick="go('host')">방 만들기 · 호스트</button>
     <div class="row mt"><input id="cd" maxlength="4" placeholder="방 코드" style="text-transform:uppercase;letter-spacing:6px;text-align:center;font-family:Cinzel,serif"><button class="btn" style="flex:0 0 96px" ${net?'':'disabled'} onclick="go('join')">참가</button></div>
-  </div>
-  <div class="panel"><h3>LOCAL</h3>
-    <p class="note" style="margin-top:0">한 기기에서 돌려가며 하거나 AI 봇과 대전합니다.</p>
-    <button class="btn full" onclick="go('local')">로컬 게임 시작</button>
-    ${saved?`<button class="btn full mt" onclick="go('resume')">자동 저장에서 이어하기 ${saved.code?'· 방 '+esc(saved.code):'· 로컬'}</button>`:''}
   </div>
   <div class="panel"><h3>SAVED GAMES</h3>
     ${saveList().length?`<div class="plist2">${saveList().map((r,k)=>`<div class="prow"><span class="sw" style="background:var(--gold)"></span><div class="t">${esc(r.at)} · ROUND ${r.S.rd}${r.S.lim?'/'+r.S.lim:''}<small>${r.S.pl.map(p=>esc(p.n)).join(', ')} · ${r.code?'온라인 방 '+esc(r.code):'로컬'}</small></div><button class="btn sm pri" onclick="loadSlot(${k})">불러오기</button><button class="btn sm" onclick="delSlot(${k})">✕</button></div>`).join('')}</div>`:'<p class="note" style="margin-top:0">게임 중 상단 💾 버튼으로 중간 저장할 수 있어요.</p>'}
@@ -818,9 +912,30 @@ function renderMenu(){
   • 공항 25·50·100·200 / 공사 주사위×4(2곳 ×10)<br>
   • 더블이면 한 번 더, 3연속은 무인도 · 무인도는 더블 또는 보석금 50<br>
   • 현금 부족 시 건물 매각 → 자동 담보대출 → 그래도 부족하면 파산 (부동산은 채권자에게)<br>
-  • 최후의 1인 또는 라운드 종료 시 총자산 1위 우승</div></div>`;
+  • 최후의 1인 또는 라운드 종료 시 총자산 1위 우승</div></div>
+  <div class="foot">© 2026 운명연구소 · 문의 support.um09@gmail.com<br>모든 캐릭터·그래픽·음악은 자체 제작 · 실제 도시와 국기는 배경 소재로만 사용</div>`;
   const nm=document.getElementById('nm');nm.oninput=()=>{myName=nm.value.trim().slice(0,8);LS.set('wt_name',myName)};
 }
+/* ---- 설치 / 빠른 시작 ---- */
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(mode==='menu')render()});
+window.addEventListener('appinstalled',()=>{deferredInstall=null;toast('앱이 설치되었습니다');if(mode==='menu')render()});
+window.addEventListener('online',()=>{if(mode==='menu')render()});window.addEventListener('offline',()=>{if(mode==='menu')render()});
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent||'');
+function installUI(){
+  if(isStandalone())return '<p class="note" style="margin:8px 0 0">📲 앱으로 실행 중 — 인터넷이 없어도 언제든 플레이할 수 있어요.</p>';
+  if(deferredInstall)return '<button class="btn full mt" onclick="doInstall()">📲 홈 화면에 앱으로 설치 (오프라인 플레이)</button>';
+  if(swOK&&isIOS())return '<p class="note" style="margin:8px 0 0">📲 Safari 하단 <b>공유</b> → <b>홈 화면에 추가</b>를 누르면 앱처럼 설치되어 오프라인에서도 플레이할 수 있어요.</p>';
+  if(swOK)return '<p class="note" style="margin:8px 0 0">📴 한 번 열어 두면 이 기기에 저장되어 인터넷 없이도 다시 열 수 있어요. 브라우저 메뉴의 "앱 설치"로 홈 화면에 추가할 수도 있어요.</p>';
+  return '';
+}
+window.doInstall=async function(){if(!deferredInstall)return;SFX.click();deferredInstall.prompt();try{await deferredInstall.userChoice}catch(e){}deferredInstall=null;render()};
+window.quickPlay=function(){SFX.click();createRoom(false);hostAct(-1,'addbot',0,true);hostAct(-1,'addbot',0,true);hostAct(-1,'start',0,true)};
+/* ---- 서비스 워커 (GitHub Pages 등 일반 웹 호스팅에서만) ---- */
+let swOK=false;
+try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&/github\.io$|localhost$/.test(location.hostname)){
+  navigator.serviceWorker.register('sw.js').then(()=>{swOK=true;if(mode==='menu')render()}).catch(()=>{})}}catch(e){}
 window.pickAv=function(i){myAv=i;LS.set('wt_av',String(i));SFX.click();const v=document.getElementById('nm').value;render();document.getElementById('nm').value=v};
 window.go=function(k){
   SFX.click();
@@ -909,7 +1024,7 @@ function renderGame(){
   }
   let b='';for(let i=0;i<40;i++)b+=tileHTML(i);
   const rolling=Date.now()<diceUntil;
-  b+=`<div class="center">${GLOBE}<div class="ttl">WORLD TYCOON</div>
+  b+=`<div class="center">${GLOBE}<svg class="cplane" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="44" ry="40" fill="none" stroke="#f3dc9a" stroke-width=".3" stroke-dasharray="1 2" opacity=".6"/><g><animateMotion dur="18s" repeatCount="indefinite" rotate="auto" path="M94 50A44 40 0 1 1 6 50A44 40 0 1 1 94 50"/><path d="M-3 0l4-.7 1.8-1.8h.9l-.9 1.8 1.8.2.7-.9h.6l-.4 1.4.4 1.4h-.6l-.7-.9-1.8.2.9 1.8h-.9l-1.8-1.8-4-.7z" fill="#f3dc9a" transform="rotate(90) scale(.9)"/></g></svg><div class="ttl">WORLD TYCOON</div>
     <div class="rd">ROUND ${Math.min(S.rd,S.lim||S.rd)}${S.lim?' / '+S.lim:''}</div>
     <div class="turn">${cur.n?av(cur,22)+' '+esc(cur.n):''}</div>
     ${S.ph==='auction'?'':`<div class="dice ${rolling?'rolling':''}" id="dice"><div class="die">${dieInner(S.d[0])}</div><div class="die">${dieInner(S.d[1])}</div></div>`}
@@ -986,7 +1101,7 @@ function diffState(a,b){
   afterQ.push(...q);
 }
 function popTile(i){const e=document.getElementById('tl'+i);if(e){e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}}
-function floatMoney(i,d){const e=document.getElementById('pc'+i);if(!e)return;const f=document.createElement('div');f.className='float '+(d>0?'up':'dn');f.textContent=(d>0?'+':'')+won(d);e.appendChild(f);setTimeout(()=>f.remove(),1700)}
+function floatMoney(i,d){const e=document.getElementById('pc'+i);if(!e)return;const f=document.createElement('div');f.className='float '+(d>0?'up':'dn');f.textContent=(d>0?'+':'')+won(d);e.appendChild(f);if(d>=100)coinBurst(e,Math.min(26,8+Math.floor(d/40)));setTimeout(()=>f.remove(),1700)}
 function bigCard(text){const old=document.querySelector('.bigcard');if(old)old.remove();
   const ic=/[+]|받기/.test(text)?IC.tax:/무인도|출국/.test(text)?IC.jail:/-|벌금|비/.test(text)?IC.lux:IC.air;
   const d=document.createElement('div');d.className='bigcard';
@@ -1002,7 +1117,8 @@ fxSize();addEventListener('resize',fxSize);
 function fxLoop(){fxc.clearRect(0,0,fx.width,fx.height);const dpr=devicePixelRatio;
   parts=parts.filter(p=>p.life>0);parts.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life--;
     fxc.save();fxc.globalAlpha=Math.min(1,p.life/30);fxc.translate(p.x*dpr,p.y*dpr);fxc.rotate(p.rot);fxc.fillStyle=p.c;
-    if(p.star){fxc.beginPath();for(let k=0;k<5;k++){fxc.lineTo(Math.cos(k*1.256)*p.s*dpr,Math.sin(k*1.256)*p.s*dpr);fxc.lineTo(Math.cos(k*1.256+.628)*p.s*.45*dpr,Math.sin(k*1.256+.628)*p.s*.45*dpr)}fxc.fill()}
+    if(p.coin){const w=Math.abs(Math.cos(p.life*.25))*p.s*dpr+1;fxc.beginPath();fxc.ellipse(0,0,w,p.s*dpr,0,0,6.283);fxc.fillStyle='#e9b949';fxc.fill();fxc.lineWidth=1.2*dpr;fxc.strokeStyle='#8a5a12';fxc.stroke();fxc.beginPath();fxc.ellipse(0,0,w*.6,p.s*dpr*.6,0,0,6.283);fxc.strokeStyle='#fff3c4';fxc.stroke()}
+    else if(p.star){fxc.beginPath();for(let k=0;k<5;k++){fxc.lineTo(Math.cos(k*1.256)*p.s*dpr,Math.sin(k*1.256)*p.s*dpr);fxc.lineTo(Math.cos(k*1.256+.628)*p.s*.45*dpr,Math.sin(k*1.256+.628)*p.s*.45*dpr)}fxc.fill()}
     else fxc.fillRect(-p.s*dpr/2,-p.s*dpr/4,p.s*dpr,p.s*dpr/2);fxc.restore()});
   if(parts.length)requestAnimationFrame(fxLoop);else{fxRun=false;fxc.clearRect(0,0,fx.width,fx.height)}}
 function fxStart(){if(!fxRun){fxRun=true;requestAnimationFrame(fxLoop)}}
